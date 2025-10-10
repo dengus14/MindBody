@@ -17,10 +17,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+@Data
 @Entity
 @Table(name = "users")
 @Setter
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
@@ -69,7 +71,7 @@ public class User implements UserDetails {
     }
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override
