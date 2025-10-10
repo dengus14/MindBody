@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         // Build the security chain
+
         return http.build();
     }
 }

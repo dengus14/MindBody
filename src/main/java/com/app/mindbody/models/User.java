@@ -20,13 +20,10 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name = "users")
-@Setter
-@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-@EqualsAndHashCode
+
 @EntityListeners(AuditingEntityListener.class) // otherwise @CreatedDate and @LastModifiedDate won't populate
 public class User implements UserDetails {
 
