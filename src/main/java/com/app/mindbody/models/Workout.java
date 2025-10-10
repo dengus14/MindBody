@@ -1,10 +1,9 @@
 package com.app.mindbody.models;
 
-import enums.WorkoutTypeEnum;
+import com.app.mindbody.enums.WorkoutTypeEnum;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
