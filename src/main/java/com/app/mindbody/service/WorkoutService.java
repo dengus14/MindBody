@@ -3,6 +3,7 @@ package com.app.mindbody.service;
 
 import com.app.mindbody.config.JwtService;
 import com.app.mindbody.controllers.AddWorkoutRequest;
+import com.app.mindbody.controllers.EditWorkoutRequest;
 import com.app.mindbody.enums.UserRoleEnums;
 import com.app.mindbody.enums.WorkoutTypeEnum;
 import com.app.mindbody.models.User;
@@ -33,6 +34,26 @@ public class WorkoutService {
                 .durationMinutes(request.getDurationMinutes())
                 .workoutType(WorkoutTypeEnum.PUSH)
                 .build();
+        workoutRepository.save(workout);
+        return workout.toString();
+    }
+
+
+
+    public String editWorkout(EditWorkoutRequest request, String token){
+
+        String username = jwtService.extractUsername(token);
+        var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
+
+        var workout = workoutRepository.findById(request.getId()).orElseThrow(() -> new RuntimeException("Workout not found"));
+
+        if(!workout.getUser().equals(user)){
+            return "Not authenticated";
+        }
+
+        workout.setDurationMinutes(request.getDurationMinutes());
+        workout.setWorkoutType(request.getWorkoutType());
+        workout.setNotes(request.getNotes());
         workoutRepository.save(workout);
         return workout.toString();
     }

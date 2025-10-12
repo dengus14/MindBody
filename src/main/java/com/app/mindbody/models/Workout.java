@@ -31,7 +31,7 @@ public class Workout {
     @Column(name = "date", nullable = false)
     private LocalDateTime created_at;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @Column(name="workout_type",nullable = false)
     private WorkoutTypeEnum workoutType;
 
