@@ -10,8 +10,11 @@ import com.app.mindbody.models.User;
 import com.app.mindbody.models.Workout;
 import com.app.mindbody.repositories.UserRepository;
 import com.app.mindbody.repositories.WorkoutRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -48,7 +51,8 @@ public class WorkoutService {
         var workout = workoutRepository.findById(request.getId()).orElseThrow(() -> new RuntimeException("Workout not found"));
 
         if(!workout.getUser().equals(user)){
-            return "Not authenticated";
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot edit someone else's workout");
+
         }
 
         workout.setDurationMinutes(request.getDurationMinutes());
@@ -57,6 +61,23 @@ public class WorkoutService {
         workoutRepository.save(workout);
         return workout.toString();
     }
+    @Transactional
+    public String removeWorkout(EditWorkoutRequest request, String token){
+
+        String username = jwtService.extractUsername(token);
+        var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
+
+        var workout = workoutRepository.findById(request.getId()).orElseThrow(() -> new RuntimeException("Workout not found"));
+
+        if(!workout.getUser().equals(user)){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot remove someone else's workout");
+
+        }
+        workoutRepository.removeById(request.getId());
+        return workout.toString();
+    }
+
+
 
 
 }
