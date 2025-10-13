@@ -3,9 +3,11 @@ package com.app.mindbody.controllers;
 import com.app.mindbody.service.WorkoutService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RequestMapping("/api")
 @RestController
@@ -13,14 +15,18 @@ import org.springframework.web.bind.annotation.*;
 public class WorkoutController {
     private final WorkoutService workoutService;
 
-    @PostMapping("/addWorkout")
-    public ResponseEntity<String> add(@RequestBody AddWorkoutRequest request,@NonNull HttpServletRequest header){
-        final String authHeader = header.getHeader("Authorization");
+    private String returnValidToken(HttpServletRequest request) {
+        final String authHeader = request.getHeader("Authorization");
         if(authHeader == null || !authHeader.startsWith("Bearer ")) {
 
-            return ResponseEntity.ok("Not Authorized");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization header");
         }
-        String token = authHeader.substring(7);
+        return authHeader.substring(7);
+    }
+
+    @PostMapping("/addWorkout")
+    public ResponseEntity<String> add(@RequestBody AddWorkoutRequest request,@NonNull HttpServletRequest header){
+        String token = returnValidToken(header);
         return ResponseEntity.ok(workoutService.addWorkout(request,token));
     }
 
@@ -28,25 +34,15 @@ public class WorkoutController {
 
     @PutMapping("/editWorkout")
     public ResponseEntity<String> edit(@RequestBody EditWorkoutRequest request,@NonNull HttpServletRequest header){
-        final String authHeader = header.getHeader("Authorization");
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
 
-            return ResponseEntity.ok("Not Authorized");
-        }
-
-        String token = authHeader.substring(7);
+        String token = returnValidToken(header);
         return ResponseEntity.ok(workoutService.editWorkout(request,token));
     }
 
     @DeleteMapping("/delWorkout")
     public ResponseEntity<String> delete(@RequestBody EditWorkoutRequest request,@NonNull HttpServletRequest header){
-        final String authHeader = header.getHeader("Authorization");
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
 
-            return ResponseEntity.ok("Not Authorized");
-        }
-
-        String token = authHeader.substring(7);
+        String token = returnValidToken(header);
         return ResponseEntity.ok(workoutService.removeWorkout(request,token));
     }
 }
