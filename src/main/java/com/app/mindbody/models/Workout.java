@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class Workout {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -46,7 +46,7 @@ public class User implements UserDetails {
     @Column(name = "streakCount", nullable = false)
     private int streak_count;
 
-    @Column(name = "longestStreak", nullable = false)
+    @Column(name = "longestStreak")
     private int longest_streak;
 
 

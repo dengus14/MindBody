@@ -6,8 +6,12 @@ import com.app.mindbody.controllers.AddWorkoutRequest;
 import com.app.mindbody.controllers.EditWorkoutRequest;
 import com.app.mindbody.enums.UserRoleEnums;
 import com.app.mindbody.enums.WorkoutTypeEnum;
+import com.app.mindbody.models.Badge;
 import com.app.mindbody.models.User;
+import com.app.mindbody.models.UserBadge;
 import com.app.mindbody.models.Workout;
+import com.app.mindbody.repositories.BadgeRepository;
+import com.app.mindbody.repositories.UserBadgeRepository;
 import com.app.mindbody.repositories.UserRepository;
 import com.app.mindbody.repositories.WorkoutRepository;
 import jakarta.transaction.Transactional;
@@ -18,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,28 +31,46 @@ public class WorkoutService {
     private final JwtService jwtService;
     private final WorkoutRepository workoutRepository;
     private final UserRepository userRepository;
+    private final BadgeRepository badgeRepository;
+    private final UserBadgeRepository userBadgeRepository;
 
 
     public String addWorkout(AddWorkoutRequest request, String token){
 
-
+        //retrieve user from JWT token
         String username = jwtService.extractUsername(token);
         var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
 
-
+        //update streak count
         if (user.getLast_workout() != null && LocalDate.now().equals(user.getLast_workout().plusDays(1))) {
             user.setStreak_count(user.getStreak_count() + 1);
             if (user.getStreak_count() >= user.getLongest_streak()) {
                 user.setLongest_streak(user.getStreak_count());
             }
+
         } else if (user.getLast_workout() == null || !LocalDate.now().equals(user.getLast_workout())) {
 
             user.setStreak_count(1);
         }
-        user.setLast_workout(LocalDate.now());
 
+
+        // adds badges to the user if he earned them
+        List<Badge> badgesList = badgeRepository.findAll();
+
+        for  (Badge badge : badgesList) {
+            if ( user.getStreak_count() >= badge.getRequirement_value() && !(userBadgeRepository.findByUserAndBadge(user,badge).isPresent())) {
+
+                UserBadge userBadge = new UserBadge();
+                userBadge.setUser(user);
+                userBadge.setBadge(badge);
+                userBadgeRepository.save(userBadge);
+            }
+        }
+        //update user
+        user.setLast_workout(LocalDate.now());
         userRepository.save(user);
 
+        //create new workout object
         var workout = Workout
                 .builder()
                 .user(user)
@@ -56,8 +79,6 @@ public class WorkoutService {
                 .workoutType(WorkoutTypeEnum.PUSH)
                 .build();
         workoutRepository.save(workout);
-
-
 
         return workout.toString();
     }
@@ -82,6 +103,10 @@ public class WorkoutService {
         workoutRepository.save(workout);
         return workout.toString();
     }
+
+
+
+
     @Transactional
     public String removeWorkout(EditWorkoutRequest request, String token){
 
