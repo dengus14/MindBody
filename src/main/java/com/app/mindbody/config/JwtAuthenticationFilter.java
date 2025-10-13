@@ -33,25 +33,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwt;
         final String userEmail;
 
-        // 1. No header → skip and continue chain
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 2. Extract token (skip "Bearer ")
-        jwt = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(jwt); // email in your case
 
-        // 3. Authenticate only if user not already authenticated
+        jwt = authHeader.substring(7);
+        userEmail = jwtService.extractUsername(jwt);
+
+
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-            // 4. Validate the JWT
+
             if (jwtService.isTokenValid(jwt, userDetails)) {
 
-                // 5. Create authentication token
+
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
@@ -63,12 +63,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
 
-                // 6. ✅ Register authenticated user in security context
+
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
 
-        // 7. Always continue filter chain
+
         filterChain.doFilter(request, response);
     }
 }

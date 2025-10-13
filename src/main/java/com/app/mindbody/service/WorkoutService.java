@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -31,13 +33,32 @@ public class WorkoutService {
 
         String username = jwtService.extractUsername(token);
         var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
+
+
+        if (user.getLast_workout() != null && LocalDate.now().equals(user.getLast_workout().plusDays(1))) {
+            user.setStreak_count(user.getStreak_count() + 1);
+            if (user.getStreak_count() >= user.getLongest_streak()) {
+                user.setLongest_streak(user.getStreak_count());
+            }
+        } else if (user.getLast_workout() == null || !LocalDate.now().equals(user.getLast_workout())) {
+
+            user.setStreak_count(1);
+        }
+        user.setLast_workout(LocalDate.now());
+
+        userRepository.save(user);
+
         var workout = Workout
                 .builder()
                 .user(user)
+
                 .durationMinutes(request.getDurationMinutes())
                 .workoutType(WorkoutTypeEnum.PUSH)
                 .build();
         workoutRepository.save(workout);
+
+
+
         return workout.toString();
     }
 

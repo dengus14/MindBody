@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -45,6 +46,10 @@ public class User implements UserDetails {
     @Column(name = "streakCount", nullable = false)
     private int streak_count;
 
+    @Column(name = "longestStreak", nullable = false)
+    private int longest_streak;
+
+
     @CreatedDate
     @Column(name = "createdAt", nullable = false)
     private LocalDateTime created_at;
@@ -55,6 +60,10 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private UserRoleEnums role ;
+
+
+    @Column(name = "lastWorkout")
+    private LocalDate last_workout;
 
 
     @Override
