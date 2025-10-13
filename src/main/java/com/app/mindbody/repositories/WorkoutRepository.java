@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface WorkoutRepository extends JpaRepository<Workout,Long> {
     Optional<Workout> findById(Long id);
+    Optional<Workout> removeById(Long id);
 }

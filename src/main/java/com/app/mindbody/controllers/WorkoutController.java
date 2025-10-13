@@ -37,4 +37,16 @@ public class WorkoutController {
         String token = authHeader.substring(7);
         return ResponseEntity.ok(workoutService.editWorkout(request,token));
     }
+
+    @DeleteMapping("/delWorkout")
+    public ResponseEntity<String> delete(@RequestBody EditWorkoutRequest request,@NonNull HttpServletRequest header){
+        final String authHeader = header.getHeader("Authorization");
+        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+
+            return ResponseEntity.ok("Not Authorized");
+        }
+
+        String token = authHeader.substring(7);
+        return ResponseEntity.ok(workoutService.removeWorkout(request,token));
+    }
 }
