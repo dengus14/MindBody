@@ -82,7 +82,7 @@ public class TestUserBadgeDTO {
         // Mock the service dependencies
         when(jwtService.extractUsername(token)).thenReturn(userEmail);
         when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(user));
-        when(userBadgeRepository.getAllByUser(user)).thenReturn(userBadges);
+        when(userBadgeRepository.findAllByUser(user)).thenReturn(userBadges);
 
         // Act - Call the service method
         List<UserBadgeDTO> result = userBadgeService.getUserBadges(token);
@@ -112,7 +112,7 @@ public class TestUserBadgeDTO {
         // Verify that the service methods were called
         verify(jwtService, times(1)).extractUsername(token);
         verify(userRepository, times(1)).findByEmail(userEmail);
-        verify(userBadgeRepository, times(1)).getAllByUser(user);
+        verify(userBadgeRepository, times(1)).findAllByUser(user);
 
         System.out.println("✅ Test passed! User badges successfully converted to DTOs");
     }
@@ -129,7 +129,7 @@ public class TestUserBadgeDTO {
 
         when(jwtService.extractUsername(token)).thenReturn(userEmail);
         when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(user));
-        when(userBadgeRepository.getAllByUser(user)).thenReturn(List.of());
+        when(userBadgeRepository.findAllByUser(user)).thenReturn(List.of());
 
         // Act
         List<UserBadgeDTO> result = userBadgeService.getUserBadges(token);

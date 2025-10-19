@@ -27,7 +27,7 @@ public class UserBadgeService {
         String username = jwtService.extractUsername(token);
         var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<UserBadge> userBadges = userBadgeRepository.getAllByUser(user);
+        List<UserBadge> userBadges = userBadgeRepository.findAllByUser(user);
         return userBadges.stream()
                 .map(UserBadgeDTO::fromEntity)  // This calls fromEntity for each item
                 .collect(Collectors.toList());
