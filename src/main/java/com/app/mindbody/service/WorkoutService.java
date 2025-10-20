@@ -37,7 +37,7 @@ public class WorkoutService {
 
         //retrieve user from JWT token
         String username = jwtService.extractUsername(token);
-        var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
+        var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
 
         //update streak count
         if (user.getLast_workout() != null && LocalDate.now().equals(user.getLast_workout().plusDays(1))) {
@@ -86,7 +86,7 @@ public class WorkoutService {
     public String editWorkout(EditWorkoutDTO request, String token){
 
         String username = jwtService.extractUsername(token);
-        var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
+        var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
 
         var workout = workoutRepository.findById(request.getId()).orElseThrow(() -> new RuntimeException("Workout not found"));
 
@@ -109,7 +109,7 @@ public class WorkoutService {
     public String removeWorkout(EditWorkoutDTO request, String token){
 
         String username = jwtService.extractUsername(token);
-        var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
+        var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
 
         var workout = workoutRepository.findById(request.getId()).orElseThrow(() -> new RuntimeException("Workout not found"));
 
@@ -122,7 +122,7 @@ public class WorkoutService {
     }
     public List<WorkoutHistoryDTO> getHistory(String token){
         String username = jwtService.extractUsername(token);
-        var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
+        var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
 
         List<Workout> allWorkouts = workoutRepository.findByUserOrderByCreatedAtDesc(user);
         return allWorkouts.stream()

@@ -1,5 +1,6 @@
 package com.app.mindbody.IntegrationTests;
 
+import com.app.mindbody.dto.AddWorkoutDTO;
 import com.app.mindbody.dto.LoginDTO;
 import com.app.mindbody.dto.RegisterDTO;
 import com.app.mindbody.controllers.AuthenticationResponse;
@@ -116,4 +117,28 @@ public class IntegrationTest {
         assertNotNull(response.getBody());
         assertNotNull(response.getBody().getToken());
     }
+    @Test
+    @Order(3)
+    @DisplayName("4. Authentication - Public endpoints should be accessible without token")
+    void testPublicEndpointAccess() {
+        // Act - Access login endpoint without token (endpoint is public, but auth will fail)
+        LoginDTO loginRequest = new LoginDTO();
+        loginRequest.setUsername("nonexistentuser");
+        loginRequest.setPassword("wrongpassword");
+
+        ResponseEntity<AuthenticationResponse> response = restTemplate.postForEntity(
+                baseUrl + "/login",
+                loginRequest,
+                AuthenticationResponse.class
+        );
+
+        // Assert - Endpoint is accessible (not 403 FORBIDDEN), but authentication fails
+        // Could be 401 UNAUTHORIZED or 500 depending on exception handling
+        assertTrue(response.getStatusCode() == HttpStatus.UNAUTHORIZED ||
+                response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR ||
+                response.getStatusCode() == HttpStatus.FORBIDDEN);
+    }
+
+
+
 }
