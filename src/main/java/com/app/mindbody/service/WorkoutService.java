@@ -4,6 +4,8 @@ package com.app.mindbody.service;
 import com.app.mindbody.config.JwtService;
 import com.app.mindbody.dto.AddWorkoutDTO;
 import com.app.mindbody.dto.EditWorkoutDTO;
+import com.app.mindbody.dto.UserBadgeDTO;
+import com.app.mindbody.dto.WorkoutHistoryDTO;
 import com.app.mindbody.enums.WorkoutTypeEnum;
 import com.app.mindbody.models.Badge;
 import com.app.mindbody.models.UserBadge;
@@ -20,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -118,7 +121,17 @@ public class WorkoutService {
         workoutRepository.removeById(request.getId());
         return workout.toString();
     }
+    public List<WorkoutHistoryDTO> getHistory(String token){
+        String username = jwtService.extractUsername(token);
+        var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
 
+        List<Workout> allWorkouts = workoutRepository.findByUserOrderByCreated_atDesc(user);
+        return allWorkouts.stream()
+                .map(WorkoutHistoryDTO::fromEntity)  // This calls fromEntity for each item
+                .collect(Collectors.toList());
+
+
+    }
 
 
 

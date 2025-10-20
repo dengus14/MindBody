@@ -2,6 +2,8 @@ package com.app.mindbody.controllers;
 
 import com.app.mindbody.dto.AddWorkoutDTO;
 import com.app.mindbody.dto.EditWorkoutDTO;
+import com.app.mindbody.dto.UserBadgeDTO;
+import com.app.mindbody.dto.WorkoutHistoryDTO;
 import com.app.mindbody.service.WorkoutService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @RequestMapping("/api")
 @RestController
@@ -46,5 +50,11 @@ public class WorkoutController {
 
         String token = returnValidToken(header);
         return ResponseEntity.ok(workoutService.removeWorkout(request,token));
+    }
+    @GetMapping("/getHistory")
+    public List<WorkoutHistoryDTO> getHistory(HttpServletRequest header) {
+        String token = returnValidToken(header);
+
+        return workoutService.getHistory(token);
     }
 }
