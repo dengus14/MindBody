@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface WorkoutRepository extends JpaRepository<Workout,Long> {
     Optional<Workout> findById(Long id);
     Optional<Workout> removeById(Long id);
-    List<Workout> findByUserOrderByCreated_atDesc(User user);
+    List<Workout> findByUserOrderByCreatedAtDesc(User user);
 }

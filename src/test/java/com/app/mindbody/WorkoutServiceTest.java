@@ -58,7 +58,7 @@ class WorkoutServiceTest {
                 .workoutType(WorkoutTypeEnum.LEGS)
                 .durationMinutes(45)
                 .notes("Morning run")
-                .created_at(LocalDateTime.now().minusDays(1))
+                .createdAt(LocalDateTime.now().minusDays(1))
                 .build();
 
         workout2 = Workout.builder()
@@ -67,7 +67,7 @@ class WorkoutServiceTest {
                 .workoutType(WorkoutTypeEnum.PUSH)
                 .durationMinutes(60)
                 .notes("Evening gym")
-                .created_at(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
                 .build();
     }
 
@@ -75,7 +75,7 @@ class WorkoutServiceTest {
     void shouldReturnUserWorkoutsSortedByDate() {
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(workoutRepository.findByUserOrderByCreated_atDesc(user))
+        when(workoutRepository.findByUserOrderByCreatedAtDesc(user))
                 .thenReturn(List.of(workout2, workout1));
 
         List<WorkoutHistoryDTO> result = workoutService.getHistory(token);
@@ -87,14 +87,14 @@ class WorkoutServiceTest {
 
         verify(jwtService, times(1)).extractUsername(token);
         verify(userRepository, times(1)).findByEmail("test@example.com");
-        verify(workoutRepository, times(1)).findByUserOrderByCreated_atDesc(user);
+        verify(workoutRepository, times(1)).findByUserOrderByCreatedAtDesc(user);
     }
 
     @Test
     void shouldReturnEmptyListWhenUserHasNoWorkouts() {
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(workoutRepository.findByUserOrderByCreated_atDesc(user))
+        when(workoutRepository.findByUserOrderByCreatedAtDesc(user))
                 .thenReturn(Collections.emptyList());
 
         List<WorkoutHistoryDTO> result = workoutService.getHistory(token);
@@ -117,7 +117,7 @@ class WorkoutServiceTest {
     void shouldMapWorkoutFieldsCorrectly() {
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(workoutRepository.findByUserOrderByCreated_atDesc(user))
+        when(workoutRepository.findByUserOrderByCreatedAtDesc(user))
                 .thenReturn(List.of(workout1));
 
         List<WorkoutHistoryDTO> result = workoutService.getHistory(token);
@@ -133,14 +133,14 @@ class WorkoutServiceTest {
     void shouldCallDependenciesExactlyOnce() {
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(workoutRepository.findByUserOrderByCreated_atDesc(user))
+        when(workoutRepository.findByUserOrderByCreatedAtDesc(user))
                 .thenReturn(List.of(workout1));
 
         workoutService.getHistory(token);
 
         verify(jwtService, times(1)).extractUsername(token);
         verify(userRepository, times(1)).findByEmail("test@example.com");
-        verify(workoutRepository, times(1)).findByUserOrderByCreated_atDesc(user);
+        verify(workoutRepository, times(1)).findByUserOrderByCreatedAtDesc(user);
         verifyNoMoreInteractions(jwtService, userRepository, workoutRepository);
     }
 }

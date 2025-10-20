@@ -54,7 +54,7 @@ public class TestBadgeAssignment {
 
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-        when(badgeRepository.findAll()).thenReturn(List.of(badge));
+        when(badgeRepository.findAllByOrderByRequirementValueAsc()).thenReturn(List.of(badge));
 
 
         workoutService.addWorkout(request, token);

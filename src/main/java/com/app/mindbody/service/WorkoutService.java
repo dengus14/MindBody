@@ -124,7 +124,7 @@ public class WorkoutService {
         String username = jwtService.extractUsername(token);
         var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<Workout> allWorkouts = workoutRepository.findByUserOrderByCreated_atDesc(user);
+        List<Workout> allWorkouts = workoutRepository.findByUserOrderByCreatedAtDesc(user);
         return allWorkouts.stream()
                 .map(WorkoutHistoryDTO::fromEntity)  // This calls fromEntity for each item
                 .collect(Collectors.toList());

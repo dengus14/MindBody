@@ -1,9 +1,6 @@
 package com.app.mindbody.dto;
 
-import com.app.mindbody.enums.RequirementTypeEnums;
 import com.app.mindbody.enums.WorkoutTypeEnum;
-import com.app.mindbody.models.Badge;
-import com.app.mindbody.models.UserBadge;
 import com.app.mindbody.models.Workout;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +26,7 @@ public class WorkoutHistoryDTO {
 
         // Build and return the DTO with values from both UserBadge and Badge
         return WorkoutHistoryDTO.builder()
-                .created_at(workout.getCreated_at())
+                .created_at(workout.getCreatedAt())
                 .workoutType(workout.getWorkoutType())
                 .durationMinutes(workout.getDurationMinutes())
                 .notes(workout.getNotes())

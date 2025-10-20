@@ -31,7 +31,7 @@ public class Workout {
 
     @CreatedDate
     @Column(name = "date", nullable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     private LocalDateTime updated_at;
