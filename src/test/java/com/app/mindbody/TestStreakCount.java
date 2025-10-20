@@ -3,6 +3,8 @@ package com.app.mindbody;
 import com.app.mindbody.config.JwtService;
 import com.app.mindbody.dto.AddWorkoutDTO;
 import com.app.mindbody.models.User;
+import com.app.mindbody.repositories.BadgeRepository;
+import com.app.mindbody.repositories.UserBadgeRepository;
 import com.app.mindbody.repositories.UserRepository;
 import com.app.mindbody.repositories.WorkoutRepository;
 import com.app.mindbody.service.WorkoutService;
@@ -28,6 +30,8 @@ public class TestStreakCount {
         @Mock private JwtService jwtService;
         @Mock private WorkoutRepository workoutRepository;
         @Mock private UserRepository userRepository;
+        @Mock private UserBadgeRepository userBadgeRepository;
+        @Mock private BadgeRepository badgeRepository;
 
         @InjectMocks
         private WorkoutService workoutService;

@@ -4,7 +4,6 @@ package com.app.mindbody.service;
 import com.app.mindbody.config.JwtService;
 import com.app.mindbody.dto.AddWorkoutDTO;
 import com.app.mindbody.dto.EditWorkoutDTO;
-import com.app.mindbody.dto.UserBadgeDTO;
 import com.app.mindbody.dto.WorkoutHistoryDTO;
 import com.app.mindbody.enums.WorkoutTypeEnum;
 import com.app.mindbody.models.Badge;
@@ -54,10 +53,10 @@ public class WorkoutService {
 
 
         // adds badges to the user if he earned them
-        List<Badge> badgesList = badgeRepository.findAll();
+        List<Badge> badgesList = badgeRepository.findAllByOrderByRequirementValueAsc();
 
         for  (Badge badge : badgesList) {
-            if ( user.getStreak_count() >= badge.getRequirement_value() && !(userBadgeRepository.findByUserAndBadge(user,badge).isPresent())) {
+            if ( user.getStreak_count() >= badge.getRequirementValue() && !(userBadgeRepository.findByUserAndBadge(user,badge).isPresent())) {
 
                 UserBadge userBadge = new UserBadge();
                 userBadge.setUser(user);

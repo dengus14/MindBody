@@ -25,7 +25,7 @@ public class Badge {
     private RequirementTypeEnums requirement_type;
 
     @Column
-    private int requirement_value;
+    private int requirementValue;
 
 
 }

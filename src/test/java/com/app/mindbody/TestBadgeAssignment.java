@@ -50,7 +50,7 @@ public class TestBadgeAssignment {
         badge.setId(1);
         badge.setBadge_name("Week Warrior");
         badge.setRequirement_type(RequirementTypeEnums.STREAK);
-        badge.setRequirement_value(7);
+        badge.setRequirementValue(7);
 
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));

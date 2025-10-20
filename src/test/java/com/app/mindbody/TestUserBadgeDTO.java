@@ -55,14 +55,14 @@ public class TestUserBadgeDTO {
         badge1.setBadge_name("Consistency Rookie");
         badge1.setBadge_description("Log workouts 3 days in a row");
         badge1.setRequirement_type(RequirementTypeEnums.STREAK);
-        badge1.setRequirement_value(3);
+        badge1.setRequirementValue(3);
 
         Badge badge2 = new Badge();
         badge2.setId(2);
         badge2.setBadge_name("Week Warrior");
         badge2.setBadge_description("Hit a 7-day workout streak");
         badge2.setRequirement_type(RequirementTypeEnums.STREAK);
-        badge2.setRequirement_value(7);
+        badge2.setRequirementValue(7);
 
         // Create mock user badges
         UserBadge userBadge1 = new UserBadge();
@@ -169,7 +169,7 @@ public class TestUserBadgeDTO {
         badge.setBadge_name("Test Badge");
         badge.setBadge_description("Test Description");
         badge.setRequirement_type(RequirementTypeEnums.STREAK);
-        badge.setRequirement_value(10);
+        badge.setRequirementValue(10);
 
         UserBadge userBadge = new UserBadge();
         userBadge.setId(1L);

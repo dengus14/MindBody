@@ -30,10 +30,10 @@ public class BadgeService {
         List<Badge> allBadges = badgeRepository.findAllByOrderByRequirementValueAsc();
 
         for (Badge badge : allBadges) {
-            if (user.getStreak_count() < badge.getRequirement_value() && !(userBadgeRepository.findByUserAndBadge(user, badge).isPresent())){
-                int daysRemaining = badge.getRequirement_value() - user.getStreak_count();
+            if (user.getStreak_count() < badge.getRequirementValue() && !(userBadgeRepository.findByUserAndBadge(user, badge).isPresent())){
+                int daysRemaining = badge.getRequirementValue() - user.getStreak_count();
                 int currentStreak = user.getStreak_count();
-                return BadgeProgressDTO.getProgressDTO(daysRemaining, badge.getRequirement_value(), currentStreak, badge.getBadge_name());
+                return BadgeProgressDTO.getProgressDTO(daysRemaining, badge.getRequirementValue(), currentStreak, badge.getBadge_name());
             }
         }
         return BadgeProgressDTO.getProgressDTO(0, 0, 0, "No Badges Earned");

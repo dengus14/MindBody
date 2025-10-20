@@ -45,7 +45,7 @@ public class TestNoDuplicateBadge {
 
         Badge badge = new Badge();
         badge.setId(1);
-        badge.setRequirement_value(3);
+        badge.setRequirementValue(3);
 
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));

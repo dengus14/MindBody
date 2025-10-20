@@ -33,7 +33,7 @@ public class UserBadgeDTO {
                 .badge_name(badge.getBadge_name())
                 .badge_description(badge.getBadge_description())
                 .requirement_type(badge.getRequirement_type())
-                .requirement_value(badge.getRequirement_value())
+                .requirement_value(badge.getRequirementValue())
                 .earned_at(userBadge.getEarned_at())
                 .build();
     }
