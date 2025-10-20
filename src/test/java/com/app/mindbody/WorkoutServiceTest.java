@@ -74,7 +74,7 @@ class WorkoutServiceTest {
     @Test
     void shouldReturnUserWorkoutsSortedByDate() {
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
         when(workoutRepository.findByUserOrderByCreatedAtDesc(user))
                 .thenReturn(List.of(workout2, workout1));
 
@@ -86,14 +86,14 @@ class WorkoutServiceTest {
         assertTrue(result.get(0).getCreated_at().isAfter(result.get(1).getCreated_at()));
 
         verify(jwtService, times(1)).extractUsername(token);
-        verify(userRepository, times(1)).findByEmail("test@example.com");
+        verify(userRepository, times(1)).findByUsername("test@example.com");
         verify(workoutRepository, times(1)).findByUserOrderByCreatedAtDesc(user);
     }
 
     @Test
     void shouldReturnEmptyListWhenUserHasNoWorkouts() {
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
         when(workoutRepository.findByUserOrderByCreatedAtDesc(user))
                 .thenReturn(Collections.emptyList());
 
@@ -106,7 +106,7 @@ class WorkoutServiceTest {
     @Test
     void shouldThrowExceptionIfUserNotFound() {
         when(jwtService.extractUsername(token)).thenReturn("missing@example.com");
-        when(userRepository.findByEmail("missing@example.com")).thenReturn(Optional.empty());
+        when(userRepository.findByUsername("missing@example.com")).thenReturn(Optional.empty());
 
         RuntimeException ex = assertThrows(RuntimeException.class,
                 () -> workoutService.getHistory(token));
@@ -116,7 +116,7 @@ class WorkoutServiceTest {
     @Test
     void shouldMapWorkoutFieldsCorrectly() {
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
         when(workoutRepository.findByUserOrderByCreatedAtDesc(user))
                 .thenReturn(List.of(workout1));
 
@@ -132,14 +132,14 @@ class WorkoutServiceTest {
     @Test
     void shouldCallDependenciesExactlyOnce() {
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
         when(workoutRepository.findByUserOrderByCreatedAtDesc(user))
                 .thenReturn(List.of(workout1));
 
         workoutService.getHistory(token);
 
         verify(jwtService, times(1)).extractUsername(token);
-        verify(userRepository, times(1)).findByEmail("test@example.com");
+        verify(userRepository, times(1)).findByUsername("test@example.com");
         verify(workoutRepository, times(1)).findByUserOrderByCreatedAtDesc(user);
         verifyNoMoreInteractions(jwtService, userRepository, workoutRepository);
     }

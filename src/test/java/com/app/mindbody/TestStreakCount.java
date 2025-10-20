@@ -44,13 +44,13 @@ public class TestStreakCount {
             request.setDurationMinutes(45);
 
             User user = new User();
-            user.setEmail("test@example.com");
+            user.setUsername("test@example.com");
             user.setLast_workout(LocalDate.now().minusDays(1));
             user.setStreak_count(3);
             user.setLongest_streak(3);
 
             when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-            when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+            when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
 
 
             workoutService.addWorkout(request, token);
@@ -70,13 +70,13 @@ public class TestStreakCount {
             request.setDurationMinutes(45);
 
             User user = new User();
-            user.setEmail("test@example.com");
+            user.setUsername("test@example.com");
             user.setLast_workout(LocalDate.now().minusDays(2));
             user.setStreak_count(5);
             user.setLongest_streak(7);
 
             when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-            when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+            when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
 
 
             workoutService.addWorkout(request, token);

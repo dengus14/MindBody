@@ -42,7 +42,7 @@ public class TestBadgeAssignment {
         request.setDurationMinutes(30);
 
         User user = new User();
-        user.setEmail("test@example.com");
+        user.setUsername("test@example.com");
         user.setStreak_count(7);
         user.setLast_workout(LocalDate.now().minusDays(1));
 
@@ -53,7 +53,7 @@ public class TestBadgeAssignment {
         badge.setRequirementValue(7);
 
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
         when(badgeRepository.findAllByOrderByRequirementValueAsc()).thenReturn(List.of(badge));
 
 
