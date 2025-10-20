@@ -1,7 +1,7 @@
 package com.app.mindbody;
 
 import com.app.mindbody.config.JwtService;
-import com.app.mindbody.controllers.AddWorkoutRequest;
+import com.app.mindbody.dto.AddWorkoutDTO;
 import com.app.mindbody.enums.WorkoutTypeEnum;
 import com.app.mindbody.models.Badge;
 import com.app.mindbody.models.User;
@@ -53,7 +53,7 @@ public class TestNoDuplicateBadge {
 
         when(userBadgeRepository.findByUserAndBadge(user, badge)).thenReturn(Optional.of(new UserBadge()));
 
-        AddWorkoutRequest request = new AddWorkoutRequest();
+        AddWorkoutDTO request = new AddWorkoutDTO();
         request.setDurationMinutes(45);
         request.setWorkoutType(WorkoutTypeEnum.PUSH);
 

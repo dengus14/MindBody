@@ -1,4 +1,4 @@
-package com.app.mindbody.controllers;
+package com.app.mindbody.dto;
 
 import com.app.mindbody.enums.WorkoutTypeEnum;
 import jakarta.validation.constraints.NotBlank;
@@ -7,13 +7,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EditWorkoutRequest {
+public class EditWorkoutDTO {
 
     @NotBlank
     private Long id;

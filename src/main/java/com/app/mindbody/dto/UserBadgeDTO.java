@@ -1,4 +1,4 @@
-package com.app.mindbody.controllers;
+package com.app.mindbody.dto;
 
 
 import com.app.mindbody.enums.RequirementTypeEnums;

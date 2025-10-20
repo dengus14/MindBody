@@ -1,6 +1,8 @@
 package com.app.mindbody.controllers;
 
 
+import com.app.mindbody.dto.LoginDTO;
+import com.app.mindbody.dto.RegisterDTO;
 import com.app.mindbody.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +19,13 @@ public class AuthController {
     private final AuthService service;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request){
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterDTO request){
         return ResponseEntity.ok(service.register(request));
     }
 
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginDTO request) {
         return ResponseEntity.ok(service.login(request));
     }
 

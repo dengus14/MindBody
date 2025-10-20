@@ -1,4 +1,4 @@
-package com.app.mindbody.controllers;
+package com.app.mindbody.dto;
 
 import com.app.mindbody.enums.WorkoutTypeEnum;
 import com.app.mindbody.models.User;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddWorkoutRequest {
+public class AddWorkoutDTO {
     private User user;
     private WorkoutTypeEnum workoutType;
     private int durationMinutes;

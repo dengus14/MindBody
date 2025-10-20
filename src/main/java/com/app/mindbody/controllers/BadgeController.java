@@ -1,8 +1,8 @@
 package com.app.mindbody.controllers;
 
-
+import com.app.mindbody.dto.BadgeProgressDTO;
 import com.app.mindbody.dto.UserBadgeDTO;
-import com.app.mindbody.service.UserBadgeService;
+import com.app.mindbody.service.BadgeService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,11 +13,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-@RequestMapping("/api/badges/user")
+@RequestMapping("/api/badges/user/get")
 @RestController
 @RequiredArgsConstructor
-public class UserBadgeController {
-    private final UserBadgeService service;
+public class BadgeController {
+    private final BadgeService service;
 
     private String returnValidToken(HttpServletRequest request) {
         final String authHeader = request.getHeader("Authorization");
@@ -29,9 +29,9 @@ public class UserBadgeController {
     }
 
     @GetMapping("/all")
-    public List<UserBadgeDTO> getUserBadges(HttpServletRequest header) {
+    public BadgeProgressDTO getProgress(HttpServletRequest header) {
         String token = returnValidToken(header);
 
-        return service.getUserBadges(token);
+        return service.getProgress(token);
     }
 }

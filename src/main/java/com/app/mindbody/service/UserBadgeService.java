@@ -2,8 +2,7 @@ package com.app.mindbody.service;
 
 
 import com.app.mindbody.config.JwtService;
-import com.app.mindbody.controllers.UserBadgeDTO;
-import com.app.mindbody.models.User;
+import com.app.mindbody.dto.UserBadgeDTO;
 import com.app.mindbody.models.UserBadge;
 import com.app.mindbody.repositories.UserBadgeRepository;
 import com.app.mindbody.repositories.UserRepository;

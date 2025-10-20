@@ -1,4 +1,4 @@
-package com.app.mindbody.controllers;
+package com.app.mindbody.dto;
 
 
 import jakarta.validation.constraints.Email;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
+public class RegisterDTO {
 
     @NotBlank
     private String username;

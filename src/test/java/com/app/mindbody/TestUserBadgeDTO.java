@@ -1,7 +1,7 @@
 package com.app.mindbody;
 
 import com.app.mindbody.config.JwtService;
-import com.app.mindbody.controllers.UserBadgeDTO;
+import com.app.mindbody.dto.UserBadgeDTO;
 import com.app.mindbody.enums.RequirementTypeEnums;
 import com.app.mindbody.models.Badge;
 import com.app.mindbody.models.User;

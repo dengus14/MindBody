@@ -2,12 +2,10 @@ package com.app.mindbody.service;
 
 
 import com.app.mindbody.config.JwtService;
-import com.app.mindbody.controllers.AddWorkoutRequest;
-import com.app.mindbody.controllers.EditWorkoutRequest;
-import com.app.mindbody.enums.UserRoleEnums;
+import com.app.mindbody.dto.AddWorkoutDTO;
+import com.app.mindbody.dto.EditWorkoutDTO;
 import com.app.mindbody.enums.WorkoutTypeEnum;
 import com.app.mindbody.models.Badge;
-import com.app.mindbody.models.User;
 import com.app.mindbody.models.UserBadge;
 import com.app.mindbody.models.Workout;
 import com.app.mindbody.repositories.BadgeRepository;
@@ -21,9 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +31,7 @@ public class WorkoutService {
     private final UserBadgeRepository userBadgeRepository;
 
 
-    public String addWorkout(AddWorkoutRequest request, String token){
+    public String addWorkout(AddWorkoutDTO request, String token){
 
         //retrieve user from JWT token
         String username = jwtService.extractUsername(token);
@@ -85,7 +81,7 @@ public class WorkoutService {
 
 
 
-    public String editWorkout(EditWorkoutRequest request, String token){
+    public String editWorkout(EditWorkoutDTO request, String token){
 
         String username = jwtService.extractUsername(token);
         var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
@@ -108,7 +104,7 @@ public class WorkoutService {
 
 
     @Transactional
-    public String removeWorkout(EditWorkoutRequest request, String token){
+    public String removeWorkout(EditWorkoutDTO request, String token){
 
         String username = jwtService.extractUsername(token);
         var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));

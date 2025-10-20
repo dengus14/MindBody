@@ -2,20 +2,16 @@ package com.app.mindbody.service;
 
 import com.app.mindbody.config.JwtService;
 import com.app.mindbody.controllers.AuthenticationResponse;
-import com.app.mindbody.controllers.LoginRequest;
-import com.app.mindbody.controllers.RegisterRequest;
+import com.app.mindbody.dto.LoginDTO;
+import com.app.mindbody.dto.RegisterDTO;
 import com.app.mindbody.enums.UserRoleEnums;
 import com.app.mindbody.repositories.UserRepository;
-import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import com.app.mindbody.models.User;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import javax.management.relation.Role;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +21,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authManager;
 
-    public AuthenticationResponse register(RegisterRequest request) {
+    public AuthenticationResponse register(RegisterDTO request) {
         var user = User
                 .builder()
                 .username(request.getUsername())
@@ -38,7 +34,7 @@ public class AuthService {
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
-    public AuthenticationResponse login(LoginRequest request) {
+    public AuthenticationResponse login(LoginDTO request) {
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(), request.getPassword()

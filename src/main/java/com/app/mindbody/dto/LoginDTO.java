@@ -1,4 +1,4 @@
-package com.app.mindbody.controllers;
+package com.app.mindbody.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginRequest {
+public class LoginDTO {
     private String password;
     private String email;
 }

@@ -1,5 +1,7 @@
 package com.app.mindbody.controllers;
 
+import com.app.mindbody.dto.AddWorkoutDTO;
+import com.app.mindbody.dto.EditWorkoutDTO;
 import com.app.mindbody.service.WorkoutService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,7 @@ public class WorkoutController {
     }
 
     @PostMapping("/addWorkout")
-    public ResponseEntity<String> add(@RequestBody AddWorkoutRequest request,@NonNull HttpServletRequest header){
+    public ResponseEntity<String> add(@RequestBody AddWorkoutDTO request, @NonNull HttpServletRequest header){
         String token = returnValidToken(header);
         return ResponseEntity.ok(workoutService.addWorkout(request,token));
     }
@@ -33,14 +35,14 @@ public class WorkoutController {
 
 
     @PutMapping("/editWorkout")
-    public ResponseEntity<String> edit(@RequestBody EditWorkoutRequest request,@NonNull HttpServletRequest header){
+    public ResponseEntity<String> edit(@RequestBody EditWorkoutDTO request, @NonNull HttpServletRequest header){
 
         String token = returnValidToken(header);
         return ResponseEntity.ok(workoutService.editWorkout(request,token));
     }
 
     @DeleteMapping("/delWorkout")
-    public ResponseEntity<String> delete(@RequestBody EditWorkoutRequest request,@NonNull HttpServletRequest header){
+    public ResponseEntity<String> delete(@RequestBody EditWorkoutDTO request, @NonNull HttpServletRequest header){
 
         String token = returnValidToken(header);
         return ResponseEntity.ok(workoutService.removeWorkout(request,token));

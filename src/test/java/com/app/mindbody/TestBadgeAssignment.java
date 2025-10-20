@@ -1,7 +1,7 @@
 package com.app.mindbody;
 
 import com.app.mindbody.config.JwtService;
-import com.app.mindbody.controllers.AddWorkoutRequest;
+import com.app.mindbody.dto.AddWorkoutDTO;
 import com.app.mindbody.enums.RequirementTypeEnums;
 import com.app.mindbody.models.Badge;
 import com.app.mindbody.models.User;
@@ -38,7 +38,7 @@ public class TestBadgeAssignment {
     @Test
     void shouldAwardBadgeWhenRequirementMet() {
         String token = "dummy.jwt.token";
-        AddWorkoutRequest request = new AddWorkoutRequest();
+        AddWorkoutDTO request = new AddWorkoutDTO();
         request.setDurationMinutes(30);
 
         User user = new User();
