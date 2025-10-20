@@ -1,6 +1,5 @@
-package com.app.mindbody.IntegrationTests;
+package com.app.mindbody.INTEGRATIONS;
 
-import com.app.mindbody.dto.AddWorkoutDTO;
 import com.app.mindbody.dto.LoginDTO;
 import com.app.mindbody.dto.RegisterDTO;
 import com.app.mindbody.controllers.AuthenticationResponse;
@@ -138,6 +137,8 @@ public class IntegrationTest {
                 response.getStatusCode() == HttpStatus.INTERNAL_SERVER_ERROR ||
                 response.getStatusCode() == HttpStatus.FORBIDDEN);
     }
+
+
 
 
 

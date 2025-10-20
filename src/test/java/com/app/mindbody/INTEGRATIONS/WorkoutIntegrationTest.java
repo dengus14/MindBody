@@ -1,9 +1,11 @@
-package com.app.mindbody;
+package com.app.mindbody.INTEGRATIONS;
 
 import com.app.mindbody.config.ApplicationConfig;
+import com.app.mindbody.dto.EditWorkoutDTO;
 import com.app.mindbody.dto.LoginDTO;
 import com.app.mindbody.dto.RegisterDTO;
 import com.app.mindbody.dto.WorkoutHistoryDTO;
+import com.app.mindbody.enums.WorkoutTypeEnum;
 import com.app.mindbody.models.User;
 import com.app.mindbody.models.Workout;
 import com.app.mindbody.repositories.UserRepository;
@@ -22,7 +24,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -182,4 +183,128 @@ public class WorkoutIntegrationTest {
         assertEquals(1, updatedHistory.getBody().length);
         assertEquals(60, updatedHistory.getBody()[0].getDurationMinutes());
     }
+
+    @Test
+    @Order(4)
+    @DisplayName("4. Edit Workout - Should update workout correctly")
+    void testEditWorkout() {
+        // 1️⃣ Register & login to get JWT
+        RegisterDTO registerRequest = new RegisterDTO();
+        registerRequest.setUsername(TEST_USERNAME);
+        registerRequest.setEmail(TEST_EMAIL);
+        registerRequest.setPassword(TEST_PASSWORD);
+
+        restTemplate.postForEntity(baseUrl + "/register", registerRequest, Object.class);
+
+        LoginDTO loginRequest = new LoginDTO();
+        loginRequest.setUsername(TEST_USERNAME);
+        loginRequest.setPassword(TEST_PASSWORD);
+
+        ResponseEntity<?> loginResponse = restTemplate.postForEntity(baseUrl + "/login", loginRequest, Object.class);
+        assertEquals(HttpStatus.OK, loginResponse.getStatusCode());
+
+        @SuppressWarnings("unchecked")
+        String token = ((java.util.Map<String, String>) loginResponse.getBody()).get("token");
+        assertNotNull(token);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        // 2️⃣ Add a workout manually
+        var user = userRepository.findByUsername(TEST_USERNAME).orElseThrow();
+        Workout workout = Workout.builder()
+                .user(user)
+                .workoutType(WorkoutTypeEnum.PUSH)
+                .durationMinutes(60)
+                .notes("Initial notes")
+                .createdAt(LocalDateTime.now())
+                .build();
+        workoutRepository.save(workout);
+
+        // 3️⃣ Prepare edit request
+        EditWorkoutDTO editRequest = new EditWorkoutDTO();
+        editRequest.setId(workout.getId());
+        editRequest.setWorkoutType(WorkoutTypeEnum.LEGS);
+        editRequest.setDurationMinutes(90);
+        editRequest.setNotes("Updated notes");
+
+        HttpEntity<EditWorkoutDTO> entity = new HttpEntity<>(editRequest, headers);
+
+        // 4️⃣ Call edit endpoint
+        ResponseEntity<String> editResponse = restTemplate.exchange(
+                "/api/editWorkout",
+                HttpMethod.PUT,
+                entity,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, editResponse.getStatusCode());
+        assertNotNull(editResponse.getBody());
+
+        // 5️⃣ Verify workout was updated in DB
+        Workout updatedWorkout = workoutRepository.findById(workout.getId()).orElseThrow();
+        assertEquals(WorkoutTypeEnum.LEGS, updatedWorkout.getWorkoutType());
+        assertEquals(90, updatedWorkout.getDurationMinutes());
+        assertEquals("Updated notes", updatedWorkout.getNotes());
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("5. Remove Workout - Should delete workout correctly")
+    void testRemoveWorkout() {
+        // 1️⃣ Register & login to get JWT
+        RegisterDTO registerRequest = new RegisterDTO();
+        registerRequest.setUsername(TEST_USERNAME);
+        registerRequest.setEmail(TEST_EMAIL);
+        registerRequest.setPassword(TEST_PASSWORD);
+
+        restTemplate.postForEntity(baseUrl + "/register", registerRequest, Object.class);
+
+        LoginDTO loginRequest = new LoginDTO();
+        loginRequest.setUsername(TEST_USERNAME);
+        loginRequest.setPassword(TEST_PASSWORD);
+
+        ResponseEntity<?> loginResponse = restTemplate.postForEntity(baseUrl + "/login", loginRequest, Object.class);
+        assertEquals(HttpStatus.OK, loginResponse.getStatusCode());
+
+        @SuppressWarnings("unchecked")
+        String token = ((java.util.Map<String, String>) loginResponse.getBody()).get("token");
+        assertNotNull(token);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        // 2️⃣ Add a workout manually
+        var user = userRepository.findByUsername(TEST_USERNAME).orElseThrow();
+        Workout workout = Workout.builder()
+                .user(user)
+                .workoutType(WorkoutTypeEnum.PUSH)
+                .durationMinutes(60)
+                .notes("Workout to delete")
+                .createdAt(LocalDateTime.now())
+                .build();
+        workoutRepository.save(workout);
+
+        // 3️⃣ Prepare delete request
+        EditWorkoutDTO deleteRequest = new EditWorkoutDTO();
+        deleteRequest.setId(workout.getId());
+
+        HttpEntity<EditWorkoutDTO> entity = new HttpEntity<>(deleteRequest, headers);
+
+        // 4️⃣ Call delete endpoint
+        ResponseEntity<String> deleteResponse = restTemplate.exchange(
+                "/api/delWorkout",
+                HttpMethod.DELETE,
+                entity,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
+        assertNotNull(deleteResponse.getBody());
+
+        // 5️⃣ Verify workout no longer exists in DB
+        boolean exists = workoutRepository.findById(workout.getId()).isPresent();
+        assertFalse(exists, "Workout should be removed from database");
+    }
+
 }
