@@ -37,10 +37,10 @@ public class AuthService {
     public AuthenticationResponse login(LoginDTO request) {
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getEmail(), request.getPassword()
+                        request.getUsername(), request.getPassword()
                 )
         );
-        var user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));
+        var user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
         return AuthenticationResponse.builder().token(jwtService.generateToken(user)).build();
     }
 }

@@ -101,7 +101,7 @@ public class IntegrationTest {
         userRepository.save(user);
 
         LoginDTO loginRequest = new LoginDTO();
-        loginRequest.setEmail(testUserEmail);
+        loginRequest.setUsername(testUsername);
         loginRequest.setPassword(testUserPassword);
 
         // Act
