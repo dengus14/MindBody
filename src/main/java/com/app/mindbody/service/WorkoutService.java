@@ -49,6 +49,9 @@ public class WorkoutService {
         } else if (user.getLast_workout() == null || !LocalDate.now().equals(user.getLast_workout())) {
 
             user.setStreak_count(1);
+            if(user.getLongest_streak() < 1){
+                user.setLongest_streak(1);
+            }
         }
 
 

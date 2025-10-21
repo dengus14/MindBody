@@ -1,10 +1,7 @@
 package com.app.mindbody.INTEGRATIONS;
 
 import com.app.mindbody.config.ApplicationConfig;
-import com.app.mindbody.dto.EditWorkoutDTO;
-import com.app.mindbody.dto.LoginDTO;
-import com.app.mindbody.dto.RegisterDTO;
-import com.app.mindbody.dto.WorkoutHistoryDTO;
+import com.app.mindbody.dto.*;
 import com.app.mindbody.enums.WorkoutTypeEnum;
 import com.app.mindbody.models.User;
 import com.app.mindbody.models.Workout;
@@ -306,5 +303,61 @@ public class WorkoutIntegrationTest {
         boolean exists = workoutRepository.findById(workout.getId()).isPresent();
         assertFalse(exists, "Workout should be removed from database");
     }
+    @Test
+    @Order(6)
+    @DisplayName("5. Add Workout - Should create a new workout and update streaks")
+    void testAddWorkout() {
+        // 1️⃣ Register & login to get JWT
+        RegisterDTO registerRequest = new RegisterDTO();
+        registerRequest.setUsername(TEST_USERNAME);
+        registerRequest.setEmail(TEST_EMAIL);
+        registerRequest.setPassword(TEST_PASSWORD);
+
+        restTemplate.postForEntity(baseUrl + "/register", registerRequest, Object.class);
+
+        LoginDTO loginRequest = new LoginDTO();
+        loginRequest.setUsername(TEST_USERNAME);
+        loginRequest.setPassword(TEST_PASSWORD);
+
+        ResponseEntity<?> loginResponse = restTemplate.postForEntity(baseUrl + "/login", loginRequest, Object.class);
+        assertEquals(HttpStatus.OK, loginResponse.getStatusCode());
+
+        @SuppressWarnings("unchecked")
+        String token = ((java.util.Map<String, String>) loginResponse.getBody()).get("token");
+        assertNotNull(token);
+
+        // 2️⃣ Create AddWorkoutDTO
+        AddWorkoutDTO addWorkoutRequest = new AddWorkoutDTO();
+        addWorkoutRequest.setDurationMinutes(45);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<AddWorkoutDTO> entity = new HttpEntity<>(addWorkoutRequest, headers);
+
+        // 3️⃣ Perform POST /api/addWorkout
+        ResponseEntity<String> addWorkoutResponse = restTemplate.postForEntity(
+                "/api/addWorkout",
+                entity,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, addWorkoutResponse.getStatusCode());
+        assertNotNull(addWorkoutResponse.getBody());
+
+        // 4️⃣ Verify workout was persisted in DB
+        var user = userRepository.findByUsername(TEST_USERNAME).orElseThrow();
+        var workouts = workoutRepository.findByUserOrderByCreatedAtDesc(user);
+
+        assertEquals(1, workouts.size());
+        var savedWorkout = workouts.get(0);
+        assertEquals(45, savedWorkout.getDurationMinutes());
+        assertEquals(com.app.mindbody.enums.WorkoutTypeEnum.PUSH, savedWorkout.getWorkoutType());
+        assertNotNull(savedWorkout.getCreatedAt());
+
+        // 5️⃣ Check streak logic
+        assertEquals(1, user.getStreak_count());
+        assertEquals(1, user.getLongest_streak());
+    }
+
 
 }

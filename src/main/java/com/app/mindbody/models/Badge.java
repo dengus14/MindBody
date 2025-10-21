@@ -4,6 +4,7 @@ package com.app.mindbody.models;
 import com.app.mindbody.enums.RequirementTypeEnums;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "badges")
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor
 public class Badge {
     @Id
