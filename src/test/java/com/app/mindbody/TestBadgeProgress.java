@@ -52,7 +52,7 @@ public class TestBadgeProgress {
         Badge badge2 = new Badge(2, "Second Badge", "Second achievement", RequirementTypeEnums.STREAK, 7);
 
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
         when(badgeRepository.findAllByOrderByRequirementValueAsc()).thenReturn(List.of(badge1, badge2));
         when(userBadgeRepository.findByUserAndBadge(user, badge1)).thenReturn(Optional.empty());
 
@@ -82,7 +82,7 @@ public class TestBadgeProgress {
         Badge badge3 = new Badge(3, "Third Badge", "Third achievement", RequirementTypeEnums.STREAK, 30);
 
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
         when(badgeRepository.findAllByOrderByRequirementValueAsc()).thenReturn(List.of(badge1, badge2, badge3));
 
         // User hasn't earned badge2 yet (and streak < requirement)
@@ -114,7 +114,7 @@ public class TestBadgeProgress {
         Badge badge2 = new Badge(2, "Second Badge", "Second achievement", RequirementTypeEnums.STREAK, 7);
 
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
         when(badgeRepository.findAllByOrderByRequirementValueAsc()).thenReturn(List.of(badge1, badge2));
 
         // badge1 is skipped because streak (5) >= requirement (3), even if not earned
@@ -147,7 +147,7 @@ public class TestBadgeProgress {
         Badge badge3 = new Badge(3, "Third Badge", "Third achievement", RequirementTypeEnums.STREAK, 30);
 
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
         when(badgeRepository.findAllByOrderByRequirementValueAsc()).thenReturn(List.of(badge1, badge2, badge3));
 
         // Act
@@ -175,7 +175,7 @@ public class TestBadgeProgress {
         Badge badge1 = new Badge(1, "Week Warrior", "7 day streak", RequirementTypeEnums.STREAK, 7);
 
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
         when(badgeRepository.findAllByOrderByRequirementValueAsc()).thenReturn(List.of(badge1));
         when(userBadgeRepository.findByUserAndBadge(user, badge1)).thenReturn(Optional.empty());
 
@@ -196,7 +196,7 @@ public class TestBadgeProgress {
         String token = "invalid.jwt.token";
 
         when(jwtService.extractUsername(token)).thenReturn("nonexistent@example.com");
-        when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
+        when(userRepository.findByUsername("nonexistent@example.com")).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(RuntimeException.class, () -> badgeService.getProgress(token));
@@ -211,7 +211,7 @@ public class TestBadgeProgress {
         user.setStreak_count(5);
 
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
         when(badgeRepository.findAllByOrderByRequirementValueAsc()).thenReturn(List.of());
 
         // Act
@@ -236,7 +236,7 @@ public class TestBadgeProgress {
         Badge badge = new Badge(1, "Starter", "Begin your journey", RequirementTypeEnums.STREAK, 1);
 
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
         when(badgeRepository.findAllByOrderByRequirementValueAsc()).thenReturn(List.of(badge));
         when(userBadgeRepository.findByUserAndBadge(user, badge)).thenReturn(Optional.empty());
 
@@ -266,7 +266,7 @@ public class TestBadgeProgress {
         UserBadge userBadge1 = new UserBadge();
 
         when(jwtService.extractUsername(token)).thenReturn("test@example.com");
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("test@example.com")).thenReturn(Optional.of(user));
         when(badgeRepository.findAllByOrderByRequirementValueAsc()).thenReturn(List.of(badge1, badge2));
 
         // User already earned badge1

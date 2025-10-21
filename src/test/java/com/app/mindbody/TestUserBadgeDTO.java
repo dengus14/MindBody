@@ -81,7 +81,7 @@ public class TestUserBadgeDTO {
 
         // Mock the service dependencies
         when(jwtService.extractUsername(token)).thenReturn(userEmail);
-        when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername(userEmail)).thenReturn(Optional.of(user));
         when(userBadgeRepository.findAllByUser(user)).thenReturn(userBadges);
 
         // Act - Call the service method
@@ -111,7 +111,7 @@ public class TestUserBadgeDTO {
 
         // Verify that the service methods were called
         verify(jwtService, times(1)).extractUsername(token);
-        verify(userRepository, times(1)).findByEmail(userEmail);
+        verify(userRepository, times(1)).findByUsername(userEmail);
         verify(userBadgeRepository, times(1)).findAllByUser(user);
 
         System.out.println("✅ Test passed! User badges successfully converted to DTOs");
@@ -128,7 +128,7 @@ public class TestUserBadgeDTO {
         user.setEmail(userEmail);
 
         when(jwtService.extractUsername(token)).thenReturn(userEmail);
-        when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername(userEmail)).thenReturn(Optional.of(user));
         when(userBadgeRepository.findAllByUser(user)).thenReturn(List.of());
 
         // Act
@@ -149,7 +149,7 @@ public class TestUserBadgeDTO {
         String userEmail = "nonexistent@example.com";
 
         when(jwtService.extractUsername(token)).thenReturn(userEmail);
-        when(userRepository.findByEmail(userEmail)).thenReturn(Optional.empty());
+        when(userRepository.findByUsername(userEmail)).thenReturn(Optional.empty());
 
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
