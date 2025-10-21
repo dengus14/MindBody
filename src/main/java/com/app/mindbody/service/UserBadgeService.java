@@ -24,7 +24,7 @@ public class UserBadgeService {
 
         //retrieve user from JWT token
         String username = jwtService.extractUsername(token);
-        var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
+        var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
 
         List<UserBadge> userBadges = userBadgeRepository.findAllByUser(user);
         return userBadges.stream()

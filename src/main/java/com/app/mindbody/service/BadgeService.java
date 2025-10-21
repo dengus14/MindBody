@@ -26,7 +26,7 @@ public class BadgeService {
     public BadgeProgressDTO getProgress(String token){
 
         String username = jwtService.extractUsername(token);
-        var user = userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
+        var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
         List<Badge> allBadges = badgeRepository.findAllByOrderByRequirementValueAsc();
 
         for (Badge badge : allBadges) {
