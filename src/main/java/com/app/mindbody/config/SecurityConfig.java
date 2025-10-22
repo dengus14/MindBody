@@ -9,6 +9,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -21,7 +26,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Disable CSRF protection (not needed for stateless REST APIs)
+                // Enable CORS and disable CSRF
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
 
                 // Configure URL access rules
@@ -30,19 +36,38 @@ public class SecurityConfig {
                         .anyRequest().authenticated()                 // everything else requires login
                 )
 
-                // Make sessions stateless (every request must carry its own token)
+                // Make sessions stateless
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // Register your custom authentication provider
+                // Register authentication provider and filters
                 .authenticationProvider(authenticationProvider)
-
-                // Add your JWT filter before the UsernamePasswordAuthenticationFilter
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // Build the security chain
-
         return http.build();
+    }
+
+    // Define allowed origins (for React frontend)
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // Allow your React frontend origin
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+
+        // Allow common methods
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // Allow common headers
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+
+        // Allow sending credentials (optional, if using cookies)
+        configuration.setAllowCredentials(true);
+
+        // Apply this config to all endpoints
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
