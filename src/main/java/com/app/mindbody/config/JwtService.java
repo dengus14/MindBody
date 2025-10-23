@@ -39,7 +39,7 @@ public class JwtService {
                 .setClaims(extraClaims) // Add custom claims (if any)
                 .setSubject(userDetails.getUsername()) // The main identity (username)
                 .setIssuedAt(new Date(System.currentTimeMillis())) // When the token was created
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24)) // Expiration time (24 minutes here)
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // Expiration time (24 minutes here)
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256) // Sign using your secret key + algorithm
                 .compact(); // Build the final token string
     }
