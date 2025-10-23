@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class WorkoutHistoryDTO {
 
+    private Long id;
     private LocalDateTime created_at;
     private WorkoutTypeEnum workoutType;
     private int durationMinutes;
@@ -26,6 +27,7 @@ public class WorkoutHistoryDTO {
 
         // Build and return the DTO with values from both UserBadge and Badge
         return WorkoutHistoryDTO.builder()
+                .id(workout.getId())
                 .created_at(workout.getCreatedAt())
                 .workoutType(workout.getWorkoutType())
                 .durationMinutes(workout.getDurationMinutes())
