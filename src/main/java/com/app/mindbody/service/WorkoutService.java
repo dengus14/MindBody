@@ -69,13 +69,13 @@ public class WorkoutService {
         }
         //update user
         user.setLast_workout(LocalDate.now());
+        user.setTotalMinutes(user.getTotalMinutes()+ request.getDurationMinutes());
         userRepository.save(user);
 
         //create new workout object
         var workout = Workout
                 .builder()
                 .user(user)
-
                 .durationMinutes(request.getDurationMinutes())
                 .workoutType(request.getWorkoutType())
                 .build();
