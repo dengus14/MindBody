@@ -65,6 +65,9 @@ public class User implements UserDetails {
     @Column(name = "lastWorkout")
     private LocalDate last_workout;
 
+    @Column(name = "totalMinutes")
+    private int totalMinutes;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
