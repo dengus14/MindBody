@@ -21,7 +21,9 @@ public class BadgeSeeder {
             List<Badge> defaultBadges = List.of(
                     new Badge(0, "Consistency Rookie", "Log workouts 3 days in a row", RequirementTypeEnums.STREAK,3),
                     new Badge(0, "Week Warrior", "Hit a 7-day workout streak", RequirementTypeEnums.STREAK,7),
-                    new Badge(0, "Unstoppable", "Achieve a 30-day streak", RequirementTypeEnums.STREAK,30)
+                    new Badge(0, "Unstoppable", "Achieve a 30-day streak", RequirementTypeEnums.STREAK,30),
+                    new Badge(0, "Iron Will", "Achieve a 90-day workout streak", RequirementTypeEnums.STREAK, 90)
+
             );
 
             badgeRepository.saveAll(defaultBadges);
