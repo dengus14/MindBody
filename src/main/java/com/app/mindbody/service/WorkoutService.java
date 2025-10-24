@@ -77,7 +77,7 @@ public class WorkoutService {
                 .builder()
                 .user(user)
                 .durationMinutes(request.getDurationMinutes())
-                .workoutType(WorkoutTypeEnum.PUSH)
+                .workoutType(request.getWorkoutType())
                 .build();
         workoutRepository.save(workout);
 
