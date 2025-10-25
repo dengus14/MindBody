@@ -15,26 +15,26 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserBadgeDTO {
+public class BadgeDTO {
     private String badge_name;
     private int badge_id;
     private String badge_description;
-    private LocalDateTime earned_at;
     private RequirementTypeEnums requirement_type;
     private int requirement_value;
+    private int progress_value;
+    private boolean completed;
 
-    public static UserBadgeDTO fromEntity(UserBadge userBadge) {
+    public static BadgeDTO fromEntity(Badge badge, int progress_value) {
         // Extract the badge object from the relationship
-        Badge badge = userBadge.getBadge();
 
         // Build and return the DTO with values from both UserBadge and Badge
-        return UserBadgeDTO.builder()
+        return BadgeDTO.builder()
                 .badge_id(badge.getId())
                 .badge_name(badge.getBadge_name())
                 .badge_description(badge.getBadge_description())
                 .requirement_type(badge.getRequirement_type())
                 .requirement_value(badge.getRequirementValue())
-                .earned_at(userBadge.getEarned_at())
+                .progress_value(progress_value)
                 .build();
     }
 }

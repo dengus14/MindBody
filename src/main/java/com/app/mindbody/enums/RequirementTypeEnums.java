@@ -2,4 +2,6 @@ package com.app.mindbody.enums;
 
 public enum RequirementTypeEnums {
     STREAK, WORKOUT_COUNT, DURATION,
+    TOTAL_DURATION, CALORIES_BURNED, TOTAL_WEIGHT_LIFTED,
+    WORKOUTS_PER_WEEK, MORNING_WORKOUTS, EVENING_WORKOUTS
 }

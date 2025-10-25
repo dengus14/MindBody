@@ -1,7 +1,7 @@
 package com.app.mindbody.controllers;
 
 
-import com.app.mindbody.dto.UserBadgeDTO;
+import com.app.mindbody.dto.BadgeDTO;
 import com.app.mindbody.service.UserBadgeService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
