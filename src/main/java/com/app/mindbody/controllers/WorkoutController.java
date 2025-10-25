@@ -2,7 +2,6 @@ package com.app.mindbody.controllers;
 
 import com.app.mindbody.dto.AddWorkoutDTO;
 import com.app.mindbody.dto.EditWorkoutDTO;
-import com.app.mindbody.dto.UserBadgeDTO;
 import com.app.mindbody.dto.WorkoutHistoryDTO;
 import com.app.mindbody.service.WorkoutService;
 import jakarta.servlet.http.HttpServletRequest;

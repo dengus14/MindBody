@@ -2,10 +2,9 @@ package com.app.mindbody.INTEGRATIONS;
 
 import com.app.mindbody.dto.LoginDTO;
 import com.app.mindbody.dto.RegisterDTO;
-import com.app.mindbody.dto.UserBadgeDTO;
+import com.app.mindbody.dto.BadgeDTO;
 import com.app.mindbody.dto.BadgeProgressDTO;
 import com.app.mindbody.enums.RequirementTypeEnums;
-import com.app.mindbody.enums.UserRoleEnums;
 import com.app.mindbody.models.Badge;
 import com.app.mindbody.models.User;
 import com.app.mindbody.models.UserBadge;
@@ -97,11 +96,11 @@ public class BadgeIntegrationTest {
         headers.setBearerAuth(token);
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<UserBadgeDTO[]> response = restTemplate.exchange(
+        ResponseEntity<BadgeDTO[]> response = restTemplate.exchange(
                 BADGE_BASE + "/user/all",
                 HttpMethod.GET,
                 entity,
-                UserBadgeDTO[].class
+                BadgeDTO[].class
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -140,11 +139,11 @@ public class BadgeIntegrationTest {
         headers.setBearerAuth(token);
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<UserBadgeDTO[]> response = restTemplate.exchange(
+        ResponseEntity<BadgeDTO[]> response = restTemplate.exchange(
                 BADGE_BASE + "/user/all",
                 HttpMethod.GET,
                 entity,
-                UserBadgeDTO[].class
+                BadgeDTO[].class
         );
 
         assertEquals(HttpStatus.OK, response.getStatusCode());

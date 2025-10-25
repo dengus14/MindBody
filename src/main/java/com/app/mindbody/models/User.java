@@ -49,6 +49,10 @@ public class User implements UserDetails {
     @Column(name = "longestStreak")
     private int longest_streak;
 
+    @Column(name = "longestWorkout")
+    private int longest_workout;
+
+
 
     @CreatedDate
     @Column(name = "createdAt", nullable = false)
@@ -68,6 +72,17 @@ public class User implements UserDetails {
     @Column(name = "totalMinutes")
     private int totalMinutes;
 
+    @Column(name = "totalWorkouts")
+    private int totalWorkouts;
+
+    @Column(name = "totalCaloriesBurned")
+    private int totalCaloriesBurned;
+
+    @Column(name = "totalMornings")
+    private int totalMornings;
+
+    @Column(name = "totalEvenings")
+    private int totalEvenings;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

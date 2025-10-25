@@ -2,6 +2,7 @@ package com.app.mindbody.service;
 
 
 import com.app.mindbody.config.JwtService;
+import com.app.mindbody.dto.BadgeDTO;
 import com.app.mindbody.dto.BadgeProgressDTO;
 import com.app.mindbody.models.Badge;
 import com.app.mindbody.repositories.BadgeRepository;
@@ -10,6 +11,7 @@ import com.app.mindbody.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,22 +23,36 @@ public class BadgeService {
     private final UserRepository userRepository;
     private final UserBadgeRepository userBadgeRepository;
     private final JwtService jwtService;
+    private final BadgeServiceCalculator badgeServiceCalculator;
 
 
-    public BadgeProgressDTO getProgress(String token){
+    public List<BadgeDTO> getProgress(String token) {
+
+//        String username = jwtService.extractUsername(token);
+//        var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+//        List<Badge> allBadges = badgeRepository.findAllByOrderByRequirementValueAsc();
+//
+//        for (Badge badge : allBadges) {
+//            if (user.getStreak_count() < badge.getRequirementValue() && !(userBadgeRepository.findByUserAndBadge(user, badge).isPresent())){
+//                int daysRemaining = badge.getRequirementValue() - user.getStreak_count();
+//                int currentStreak = user.getStreak_count();
+//                return BadgeProgressDTO.getProgressDTO(daysRemaining, badge.getRequirementValue(), currentStreak, badge.getBadge_name());
+//            }
+//        }
+//        return BadgeProgressDTO.getProgressDTO(0, 0, 0, "No Badges Earned");
+//    }
+
 
         String username = jwtService.extractUsername(token);
         var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
         List<Badge> allBadges = badgeRepository.findAllByOrderByRequirementValueAsc();
+        List<BadgeDTO> retList = new ArrayList<BadgeDTO>();
 
         for (Badge badge : allBadges) {
-            if (user.getStreak_count() < badge.getRequirementValue() && !(userBadgeRepository.findByUserAndBadge(user, badge).isPresent())){
-                int daysRemaining = badge.getRequirementValue() - user.getStreak_count();
-                int currentStreak = user.getStreak_count();
-                return BadgeProgressDTO.getProgressDTO(daysRemaining, badge.getRequirementValue(), currentStreak, badge.getBadge_name());
-            }
+            int progrValue = badgeServiceCalculator.getProgressValue(badge, user);
+            BadgeDTO toList = BadgeDTO.fromEntity(badge, progrValue);
+            retList.add(toList);
         }
-        return BadgeProgressDTO.getProgressDTO(0, 0, 0, "No Badges Earned");
+        return retList;
     }
-
 }

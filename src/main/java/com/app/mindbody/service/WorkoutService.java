@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,6 +71,19 @@ public class WorkoutService {
         //update user
         user.setLast_workout(LocalDate.now());
         user.setTotalMinutes(user.getTotalMinutes()+ request.getDurationMinutes());
+        user.setLongest_workout(user.getLongest_workout() < request.getDurationMinutes() ? request.getDurationMinutes() : user.getLongest_workout());
+
+        //increment morning or evening workouts based on time of day
+        LocalDateTime now = LocalDateTime.now();
+        int hour = now.getHour();
+
+        // increment morning or evening workouts
+        if (hour >= 5 && hour < 12) {
+            user.setTotalMornings(user.getTotalMornings() + 1);
+        } else {
+            user.setTotalEvenings(user.getTotalEvenings() + 1);
+        }
+
         userRepository.save(user);
 
         //create new workout object

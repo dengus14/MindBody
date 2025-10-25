@@ -1,7 +1,6 @@
 package com.app.mindbody.controllers;
 
 import com.app.mindbody.dto.BadgeProgressDTO;
-import com.app.mindbody.dto.UserBadgeDTO;
 import com.app.mindbody.service.BadgeService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class BadgeController {
     }
 
     @GetMapping("/all")
-    public BadgeProgressDTO getProgress(HttpServletRequest header) {
+    public List<BadgeProgressDTO> getProgress(HttpServletRequest header) {
         String token = returnValidToken(header);
 
         return service.getProgress(token);
