@@ -1,7 +1,7 @@
 package com.app.mindbody;
 
 import com.app.mindbody.config.JwtService;
-import com.app.mindbody.dto.BadgeDTO;
+import com.app.mindbody.dto.UserBadgeDTO;
 import com.app.mindbody.enums.RequirementTypeEnums;
 import com.app.mindbody.models.Badge;
 import com.app.mindbody.models.User;
@@ -85,14 +85,14 @@ public class TestUserBadgeDTO {
         when(userBadgeRepository.findAllByUser(user)).thenReturn(userBadges);
 
         // Act - Call the service method
-        List<BadgeDTO> result = userBadgeService.getUserBadges(token);
+        List<UserBadgeDTO> result = userBadgeService.getUserBadges(token);
 
         // Assert - Verify the results
         assertNotNull(result);
         assertEquals(2, result.size());
 
         // Verify first badge
-        BadgeDTO dto1 = result.get(0);
+        UserBadgeDTO dto1 = result.get(0);
         assertEquals(1, dto1.getBadge_id());
         assertEquals("Consistency Rookie", dto1.getBadge_name());
         assertEquals("Log workouts 3 days in a row", dto1.getBadge_description());
@@ -101,7 +101,7 @@ public class TestUserBadgeDTO {
         assertEquals(LocalDateTime.of(2025, 1, 10, 12, 0), dto1.getEarned_at());
 
         // Verify second badge
-        BadgeDTO dto2 = result.get(1);
+        UserBadgeDTO dto2 = result.get(1);
         assertEquals(2, dto2.getBadge_id());
         assertEquals("Week Warrior", dto2.getBadge_name());
         assertEquals("Hit a 7-day workout streak", dto2.getBadge_description());
@@ -132,7 +132,7 @@ public class TestUserBadgeDTO {
         when(userBadgeRepository.findAllByUser(user)).thenReturn(List.of());
 
         // Act
-        List<BadgeDTO> result = userBadgeService.getUserBadges(token);
+        List<UserBadgeDTO> result = userBadgeService.getUserBadges(token);
 
         // Assert
         assertNotNull(result);
@@ -177,7 +177,7 @@ public class TestUserBadgeDTO {
         userBadge.setEarned_at(LocalDateTime.of(2025, 2, 1, 10, 30));
 
         // Act - Use the static fromEntity method
-        BadgeDTO dto = BadgeDTO.fromEntity(userBadge);
+        UserBadgeDTO dto = UserBadgeDTO.fromEntity(userBadge);
 
         // Assert - Verify all fields are correctly mapped
         assertNotNull(dto);
