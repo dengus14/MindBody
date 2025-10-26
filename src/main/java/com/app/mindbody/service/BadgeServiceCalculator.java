@@ -21,26 +21,18 @@ public class BadgeServiceCalculator {
         switch( badge.getRequirement_type()){
             case RequirementTypeEnums.STREAK:
                 return user.getStreak_count();
-                break;
             case RequirementTypeEnums.DURATION:
                 return user.getLongest_workout();
-                break;
             case RequirementTypeEnums.TOTAL_DURATION:
                 return user.getTotalMinutes();
-                break;
             case RequirementTypeEnums.WORKOUT_COUNT:
                 return user.getTotalWorkouts();
-                break;
             case RequirementTypeEnums.MORNING_WORKOUTS:
                 return user.getTotalMornings();
-                break;
             case RequirementTypeEnums.EVENING_WORKOUTS:
                 return user.getTotalEvenings();
-                break;
-
-
-
         }
 
+        return 0;
     }
 }
