@@ -20,6 +20,7 @@ public class UserDTO {
     private int streak_count;
     private int longest_streak;
     private int totalMinutes;
+    private int points;
     private LocalDate last_workout;
     private LocalDateTime created_at;
 }

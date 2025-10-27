@@ -44,14 +44,13 @@ public class User implements UserDetails {
     private String password_hash;
 
     @Column(name = "streakCount", nullable = false)
-    private int streak_count;
+    private Integer streak_count = 0;
 
-    @Column(name = "longestStreak")
-    private int longest_streak;
+    @Column(name = "longestStreak", nullable = false)
+    private Integer longest_streak = 0;
 
-    @Column(name = "longestWorkout")
-    private int longest_workout;
-
+    @Column(name = "longestWorkout",nullable = false)
+    private Integer longest_workout = 0;
 
 
     @CreatedDate
@@ -63,26 +62,29 @@ public class User implements UserDetails {
     private LocalDateTime last_login;
 
     @Enumerated(EnumType.STRING)
-    private UserRoleEnums role ;
+    private UserRoleEnums role;
 
 
     @Column(name = "lastWorkout")
     private LocalDate last_workout;
 
-    @Column(name = "totalMinutes")
-    private int totalMinutes;
+    @Column(name = "totalMinutes",nullable = false)
+    private Integer totalMinutes=0;
 
-    @Column(name = "totalWorkouts")
-    private int totalWorkouts;
+    @Column(name = "points", nullable = false)
+    private Integer points = 0;
+
+    @Column(name = "totalWorkouts",nullable = false)
+    private Integer totalWorkouts=0;
 
     @Column(name = "totalCaloriesBurned")
-    private int totalCaloriesBurned;
+    private Integer totalCaloriesBurned;
 
     @Column(name = "totalMornings")
-    private int totalMornings;
+    private Integer totalMornings;
 
     @Column(name = "totalEvenings")
-    private int totalEvenings;
+    private Integer totalEvenings;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -93,6 +95,7 @@ public class User implements UserDetails {
     public String getPassword() {
         return password_hash;
     }
+
     @Override
     public String getUsername() {
         return username;
@@ -116,5 +119,17 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (streak_count == null) streak_count = 0;
+        if (longest_streak == null) longest_streak = 0;
+        if (points == null) points = 0;
+        if (totalMinutes == null) totalMinutes = 0;
+        if (totalWorkouts == null) totalWorkouts = 0;
+        if (totalCaloriesBurned == null) totalCaloriesBurned = 0;
+        if (totalMornings == null) totalMornings = 0;
+        if (totalEvenings == null) totalEvenings = 0;
     }
 }
