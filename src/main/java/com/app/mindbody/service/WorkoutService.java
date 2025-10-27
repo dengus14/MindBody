@@ -93,6 +93,7 @@ public class WorkoutService {
                 .user(user)
                 .durationMinutes(request.getDurationMinutes())
                 .workoutType(request.getWorkoutType())
+                .notes(request.getNotes())
                 .build();
         workoutRepository.save(workout);
 

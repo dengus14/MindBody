@@ -35,6 +35,7 @@ public class BadgeDTO {
                 .requirement_type(badge.getRequirement_type())
                 .requirement_value(badge.getRequirementValue())
                 .progress_value(progress_value)
+                .completed(progress_value >= badge.getRequirementValue())
                 .build();
     }
 }

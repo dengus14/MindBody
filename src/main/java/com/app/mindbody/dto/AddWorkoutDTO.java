@@ -16,4 +16,5 @@ public class AddWorkoutDTO {
     private User user;
     private WorkoutTypeEnum workoutType;
     private int durationMinutes;
+    private String notes;
 }
