@@ -72,6 +72,7 @@ public class WorkoutService {
         user.setLast_workout(LocalDate.now());
         user.setTotalMinutes(user.getTotalMinutes()+ request.getDurationMinutes());
         user.setLongest_workout(user.getLongest_workout() < request.getDurationMinutes() ? request.getDurationMinutes() : user.getLongest_workout());
+        user.setTotalWorkouts(user.getTotalWorkouts() + 1);
 
         //increment morning or evening workouts based on time of day
         LocalDateTime now = LocalDateTime.now();
