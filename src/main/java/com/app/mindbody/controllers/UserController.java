@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
@@ -43,5 +45,26 @@ public class UserController {
                 .build();
 
         return ResponseEntity.ok(dto);
+    }
+    @GetMapping("/top")
+    public ResponseEntity<List<UserDTO>> getTopUsersByPoints() {
+        List<User> users = userRepository.findTop50ByOrderByPointsDesc();
+
+        // sanitize nulls to zero
+        List<UserDTO> dtos = users.stream()
+                .map(u -> UserDTO.builder()
+                        .id(u.getId())
+                        .username(u.getUsername())
+                        .email(u.getEmail())
+                        .streak_count(u.getStreak_count() == null ? 0 : u.getStreak_count())
+                        .longest_streak(u.getLongest_streak() == null ? 0 : u.getLongest_streak())
+                        .totalMinutes(u.getTotalMinutes() == null ? 0 : u.getTotalMinutes())
+                        .points(u.getPoints() == null ? 0 : u.getPoints())
+                        .last_workout(u.getLast_workout())
+                        .created_at(u.getCreated_at())
+                        .build())
+                .toList();
+
+        return ResponseEntity.ok(dtos);
     }
 }

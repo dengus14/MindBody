@@ -34,51 +34,60 @@ public class WorkoutService {
     private final UserBadgeRepository userBadgeRepository;
 
 
-    public String addWorkout(AddWorkoutDTO request, String token){
-
-        //retrieve user from JWT token
+    public String addWorkout(AddWorkoutDTO request, String token) {
+        // Retrieve user from JWT token
         String username = jwtService.extractUsername(token);
-        var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        //update streak count
+        // === Defensive null guards ===
+        user.setStreak_count(user.getStreak_count() == null ? 0 : user.getStreak_count());
+        user.setLongest_streak(user.getLongest_streak() == null ? 0 : user.getLongest_streak());
+        user.setLongest_workout(user.getLongest_workout() == null ? 0 : user.getLongest_workout());
+        user.setTotalMinutes(user.getTotalMinutes() == null ? 0 : user.getTotalMinutes());
+        user.setPoints(user.getPoints() == null ? 0 : user.getPoints());
+        user.setTotalWorkouts(user.getTotalWorkouts() == null ? 0 : user.getTotalWorkouts());
+        user.setTotalMornings(user.getTotalMornings() == null ? 0 : user.getTotalMornings());
+        user.setTotalEvenings(user.getTotalEvenings() == null ? 0 : user.getTotalEvenings());
+
+        // === Update streak count ===
         if (user.getLast_workout() != null && LocalDate.now().equals(user.getLast_workout().plusDays(1))) {
             user.setStreak_count(user.getStreak_count() + 1);
             if (user.getStreak_count() >= user.getLongest_streak()) {
                 user.setLongest_streak(user.getStreak_count());
             }
-
         } else if (user.getLast_workout() == null || !LocalDate.now().equals(user.getLast_workout())) {
-
             user.setStreak_count(1);
-            if(user.getLongest_streak() < 1){
+            if (user.getLongest_streak() < 1) {
                 user.setLongest_streak(1);
             }
         }
 
-
-        // adds badges to the user if he earned them
+        // === Badge assignment ===
         List<Badge> badgesList = badgeRepository.findAllByOrderByRequirementValueAsc();
-
-        for  (Badge badge : badgesList) {
-            if ( user.getStreak_count() >= badge.getRequirementValue() && !(userBadgeRepository.findByUserAndBadge(user,badge).isPresent())) {
-
+        for (Badge badge : badgesList) {
+            boolean alreadyHasBadge = userBadgeRepository.findByUserAndBadge(user, badge).isPresent();
+            if (user.getStreak_count() >= badge.getRequirementValue() && !alreadyHasBadge) {
                 UserBadge userBadge = new UserBadge();
                 userBadge.setUser(user);
                 userBadge.setBadge(badge);
                 userBadgeRepository.save(userBadge);
             }
         }
-        //update user
+
+        // === Workout + stats updates ===
         user.setLast_workout(LocalDate.now());
-        user.setTotalMinutes(user.getTotalMinutes()+ request.getDurationMinutes());
-        user.setLongest_workout(user.getLongest_workout() < request.getDurationMinutes() ? request.getDurationMinutes() : user.getLongest_workout());
+        user.setTotalMinutes(user.getTotalMinutes() + request.getDurationMinutes());
+        user.setPoints(user.getPoints() + 10);
+        user.setLongest_workout(
+                user.getLongest_workout() < request.getDurationMinutes()
+                        ? request.getDurationMinutes()
+                        : user.getLongest_workout()
+        );
         user.setTotalWorkouts(user.getTotalWorkouts() + 1);
 
-        //increment morning or evening workouts based on time of day
-        LocalDateTime now = LocalDateTime.now();
-        int hour = now.getHour();
-
-        // increment morning or evening workouts
+        // Morning/evening counts
+        int hour = LocalDateTime.now().getHour();
         if (hour >= 5 && hour < 12) {
             user.setTotalMornings(user.getTotalMornings() + 1);
         } else {
@@ -87,18 +96,19 @@ public class WorkoutService {
 
         userRepository.save(user);
 
-        //create new workout object
-        var workout = Workout
-                .builder()
+        // === Save workout record ===
+        Workout workout = Workout.builder()
                 .user(user)
                 .durationMinutes(request.getDurationMinutes())
                 .workoutType(request.getWorkoutType())
                 .notes(request.getNotes())
                 .build();
+
         workoutRepository.save(workout);
 
         return workout.toString();
     }
+
 
 
 
