@@ -43,13 +43,16 @@ public class User implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password_hash;
 
+    @Builder.Default
     @Column(name = "streakCount", nullable = false)
     private Integer streak_count = 0;
 
+    @Builder.Default
     @Column(name = "longestStreak", nullable = false)
     private Integer longest_streak = 0;
 
-    @Column(name = "longestWorkout",nullable = false)
+    @Builder.Default
+    @Column(name = "longestWorkout", nullable = false)
     private Integer longest_workout = 0;
 
 
@@ -68,12 +71,15 @@ public class User implements UserDetails {
     @Column(name = "lastWorkout")
     private LocalDate last_workout;
 
+    @Builder.Default
     @Column(name = "totalMinutes",nullable = false)
     private Integer totalMinutes=0;
 
+    @Builder.Default
     @Column(name = "points", nullable = false)
     private Integer points = 0;
 
+    @Builder.Default
     @Column(name = "totalWorkouts",nullable = false)
     private Integer totalWorkouts=0;
 
