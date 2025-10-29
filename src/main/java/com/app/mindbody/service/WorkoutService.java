@@ -7,6 +7,7 @@ import com.app.mindbody.dto.EditWorkoutDTO;
 import com.app.mindbody.dto.WorkoutHistoryDTO;
 import com.app.mindbody.enums.WorkoutTypeEnum;
 import com.app.mindbody.models.Badge;
+import com.app.mindbody.models.User;
 import com.app.mindbody.models.UserBadge;
 import com.app.mindbody.models.Workout;
 import com.app.mindbody.repositories.BadgeRepository;
@@ -33,6 +34,33 @@ public class WorkoutService {
     private final BadgeRepository badgeRepository;
     private final UserBadgeRepository userBadgeRepository;
 
+    private void awardBadges(User user) {
+        List<Badge> badgesList = badgeRepository.findAllByOrderByRequirementValueAsc();
+
+        for (Badge badge : badgesList) {
+            boolean alreadyHasBadge = userBadgeRepository.findByUserAndBadge(user, badge).isPresent();
+            if (alreadyHasBadge) continue;
+
+            boolean qualifies = switch (badge.getRequirement_type()) {
+                case STREAK -> user.getStreak_count() >= badge.getRequirementValue();
+                case WORKOUT_COUNT -> user.getTotalWorkouts() >= badge.getRequirementValue();
+                case DURATION -> user.getLongest_workout() >= badge.getRequirementValue();
+                case TOTAL_DURATION -> user.getTotalMinutes() >= badge.getRequirementValue();
+                case MORNING_WORKOUTS -> user.getTotalMornings() >= badge.getRequirementValue();
+                case EVENING_WORKOUTS -> user.getTotalEvenings() >= badge.getRequirementValue();
+                default -> false;
+            };
+
+            if (qualifies) {
+                UserBadge userBadge = new UserBadge();
+                userBadge.setUser(user);
+                userBadge.setBadge(badge);
+                userBadgeRepository.save(userBadge);
+            }
+        }
+    }
+
+
 
     public String addWorkout(AddWorkoutDTO request, String token) {
         // Retrieve user from JWT token
@@ -40,7 +68,7 @@ public class WorkoutService {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // === Defensive null guards ===
+        //  Defensive null guards
         user.setStreak_count(user.getStreak_count() == null ? 0 : user.getStreak_count());
         user.setLongest_streak(user.getLongest_streak() == null ? 0 : user.getLongest_streak());
         user.setLongest_workout(user.getLongest_workout() == null ? 0 : user.getLongest_workout());
@@ -50,7 +78,7 @@ public class WorkoutService {
         user.setTotalMornings(user.getTotalMornings() == null ? 0 : user.getTotalMornings());
         user.setTotalEvenings(user.getTotalEvenings() == null ? 0 : user.getTotalEvenings());
 
-        // === Update streak count ===
+        //  Update streak count
         if (user.getLast_workout() != null && LocalDate.now().equals(user.getLast_workout().plusDays(1))) {
             user.setStreak_count(user.getStreak_count() + 1);
             if (user.getStreak_count() >= user.getLongest_streak()) {
@@ -63,27 +91,13 @@ public class WorkoutService {
             }
         }
 
-        // === Badge assignment ===
-        List<Badge> badgesList = badgeRepository.findAllByOrderByRequirementValueAsc();
-        for (Badge badge : badgesList) {
-            boolean alreadyHasBadge = userBadgeRepository.findByUserAndBadge(user, badge).isPresent();
-            if (user.getStreak_count() >= badge.getRequirementValue() && !alreadyHasBadge) {
-                UserBadge userBadge = new UserBadge();
-                userBadge.setUser(user);
-                userBadge.setBadge(badge);
-                userBadgeRepository.save(userBadge);
-            }
-        }
 
-        // === Workout + stats updates ===
+
+        //  Workout + stats updates
         user.setLast_workout(LocalDate.now());
         user.setTotalMinutes(user.getTotalMinutes() + request.getDurationMinutes());
         user.setPoints(user.getPoints() + 10);
-        user.setLongest_workout(
-                user.getLongest_workout() < request.getDurationMinutes()
-                        ? request.getDurationMinutes()
-                        : user.getLongest_workout()
-        );
+        user.setLongest_workout(Math.max(user.getLongest_workout(), request.getDurationMinutes()));
         user.setTotalWorkouts(user.getTotalWorkouts() + 1);
 
         // Morning/evening counts
@@ -95,8 +109,8 @@ public class WorkoutService {
         }
 
         userRepository.save(user);
-
-        // === Save workout record ===
+        awardBadges(user);
+        //  Save workout record
         Workout workout = Workout.builder()
                 .user(user)
                 .durationMinutes(request.getDurationMinutes())
