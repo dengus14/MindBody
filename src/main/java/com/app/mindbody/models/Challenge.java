@@ -1,8 +1,6 @@
 package com.app.mindbody.models;
 
-
 import com.app.mindbody.enums.ChallengeType;
-import com.app.mindbody.enums.RequirementTypeEnums;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,31 +9,31 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-@Table(name = "challenges")
+@Table(name = "challenges", indexes = {
+        @Index(name = "idx_challenge_type", columnList = "type")
+})
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
 public class Challenge {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column
-    private String challenge_name;
+    @Column(name = "challenge_name", nullable = false)
+    private String challengeName;
 
-    @Column
-    private String challenge_description;
+    @Column(name = "challenge_description", nullable = false, length = 500)
+    private String challengeDescription;
 
-    @Column
+    @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     private ChallengeType type;
 
-
-    @Column
+    @Column(name = "points", nullable = false)
     private Integer points;
 
-    @Column
-    private Integer requirementChallengeValue;
+    @Column(name = "requirement_value", nullable = false)
+    private Integer requirementValue;
 }

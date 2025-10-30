@@ -1,6 +1,5 @@
 package com.app.mindbody.service;
 
-
 import com.app.mindbody.config.JwtService;
 import com.app.mindbody.dto.AddWorkoutDTO;
 import com.app.mindbody.dto.EditWorkoutDTO;
@@ -33,6 +32,7 @@ public class WorkoutService {
     private final UserRepository userRepository;
     private final BadgeRepository badgeRepository;
     private final UserBadgeRepository userBadgeRepository;
+    private final ChallengeProgressService challengeProgressService; // Add this
 
     private void awardBadges(User user) {
         List<Badge> badgesList = badgeRepository.findAllByOrderByRequirementValueAsc();
@@ -59,8 +59,6 @@ public class WorkoutService {
             }
         }
     }
-
-
 
     public String addWorkout(AddWorkoutDTO request, String token) {
         // Retrieve user from JWT token
@@ -91,8 +89,6 @@ public class WorkoutService {
             }
         }
 
-
-
         //  Workout + stats updates
         user.setLast_workout(LocalDate.now());
         user.setTotalMinutes(user.getTotalMinutes() + request.getDurationMinutes());
@@ -109,7 +105,12 @@ public class WorkoutService {
         }
 
         userRepository.save(user);
+
+        // Award badges based on updated stats
         awardBadges(user);
+
+
+
         //  Save workout record
         Workout workout = Workout.builder()
                 .user(user)
@@ -119,15 +120,13 @@ public class WorkoutService {
                 .build();
 
         workoutRepository.save(workout);
+        // Update challenge progress after user stats are updated
+        challengeProgressService.updateAllChallengeProgress(user);
 
         return workout.toString();
     }
 
-
-
-
     public String editWorkout(EditWorkoutDTO request, String token){
-
         String username = jwtService.extractUsername(token);
         var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -135,7 +134,6 @@ public class WorkoutService {
 
         if(!workout.getUser().equals(user)){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot edit someone else's workout");
-
         }
 
         workout.setDurationMinutes(request.getDurationMinutes());
@@ -145,12 +143,8 @@ public class WorkoutService {
         return workout.toString();
     }
 
-
-
-
     @Transactional
     public String removeWorkout(EditWorkoutDTO request, String token){
-
         String username = jwtService.extractUsername(token);
         var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -158,24 +152,19 @@ public class WorkoutService {
 
         if(!workout.getUser().equals(user)){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot remove someone else's workout");
-
         }
+
         workoutRepository.removeById(request.getId());
         return workout.toString();
     }
+
     public List<WorkoutHistoryDTO> getHistory(String token){
         String username = jwtService.extractUsername(token);
         var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
 
         List<Workout> allWorkouts = workoutRepository.findByUserOrderByCreatedAtDesc(user);
         return allWorkouts.stream()
-                .map(WorkoutHistoryDTO::fromEntity)  // This calls fromEntity for each item
+                .map(WorkoutHistoryDTO::fromEntity)
                 .collect(Collectors.toList());
-
-
     }
-
-
-
-
 }
