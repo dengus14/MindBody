@@ -1,86 +1,78 @@
 package com.app.mindbody.service;
 
-
-import com.app.mindbody.config.JwtService;
-import com.app.mindbody.enums.ChallengeType;
-import com.app.mindbody.models.Challenge;
+import com.app.mindbody.dto.ChallengeDTO;
+import com.app.mindbody.dto.ClaimChallengeRequest;
+import com.app.mindbody.dto.ClaimChallengeResponse;
+import com.app.mindbody.models.User;
 import com.app.mindbody.models.UserChallenge;
-import com.app.mindbody.repositories.*;
+import com.app.mindbody.repositories.UserChallengeRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.threeten.extra.YearWeek;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.temporal.WeekFields;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChallengeService {
 
-
-    private final ChallengeRepository challengeRepository;
     private final UserChallengeRepository userChallengeRepository;
-    private final UserRepository userRepository;
-    private final JwtService jwtService;
+    private final ChallengeAssignmentService assignmentService;
+    private final ChallengeCompletionService completionService;
+    private final ChallengeProgressService progressService;
 
+    /**
+     * Get user's active challenges (daily + weekly for current period)
+     */
+    @Transactional(readOnly = true)
+    public List<ChallengeDTO> getActiveChallenges(User user) {
+        LocalDate today = LocalDate.now();
+        WeekFields weekFields = WeekFields.of(Locale.getDefault());
+        int year = today.get(weekFields.weekBasedYear());
+        int weekNumber = today.get(weekFields.weekOfWeekBasedYear());
 
-    public void getThreeDailies(String token) {
+        List<UserChallenge> dailies = userChallengeRepository.findActiveDailyChallenges(user, today);
+        List<UserChallenge> weeklies = userChallengeRepository.findActiveWeeklyChallenges(user, year, weekNumber);
 
+        List<UserChallenge> allActive = new ArrayList<>();
+        allActive.addAll(dailies);
+        allActive.addAll(weeklies);
 
-        String username = jwtService.extractUsername(token);
-        var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
-
-        boolean assigned = userChallengeRepository.existsByUserAndChallenge_TypeAndAssignedDate(user, ChallengeType.DAILY, LocalDate.now());
-
-        if(assigned){
-            return;
-        }
-        else{
-            List<Challenge> threeDailyChallenges = challengeRepository.findAllByType(ChallengeType.DAILY, PageRequest.of(0, 3));
-            threeDailyChallenges.forEach(challenge -> {
-                userChallengeRepository.save(
-                        UserChallenge.builder()
-                                .user(user)
-                                .challenge(challenge)
-                                .assignedDate(LocalDate.now())
-                                .assignedWeek(YearWeek.now())
-                                .completed(false)
-                                .build()
-                );
-            });
-
-        }
-
+        return allActive.stream()
+                .map(ChallengeDTO::fromEntity)
+                .collect(Collectors.toList());
     }
 
+    /**
+     * Ensure user has challenges assigned for today/this week
+     */
+    @Transactional
+    public void ensureChallengesAssigned(User user) {
+        LocalDate today = LocalDate.now();
+        assignmentService.assignDailyChallenges(user, today);
+        assignmentService.assignWeeklyChallenges(user, today);
+    }
 
-    public void getThreeWeeklies(String token) {
+    /**
+     * Claim a completed challenge
+     */
+    @Transactional
+    public ClaimChallengeResponse claimChallenge(ClaimChallengeRequest request, User user) {
+        return completionService.claimChallenge(request.getUserChallengeId(), user);
+    }
 
-
-        String username = jwtService.extractUsername(token);
-        var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
-
-        boolean assigned = userChallengeRepository.existsByUserAndChallenge_TypeAndAssignedWeek(user, ChallengeType.WEEKLY, YearWeek.now());
-
-        if(assigned){
-            return;
-        }
-        else{
-            List<Challenge> threeWeeklyChallenges = challengeRepository.findAllByType(ChallengeType.WEEKLY, PageRequest.of(0, 3));
-            threeWeeklyChallenges.forEach(challenge -> {
-                userChallengeRepository.save(
-                        UserChallenge.builder()
-                                .user(user)
-                                .challenge(challenge)
-                                .assignedDate(LocalDate.now())
-                                .assignedWeek(YearWeek.now())
-                                .completed(false)
-                                .build()
-                );
-            });
-
-        }
-
+    /**
+     * Update challenge progress for a user (call after workouts, achievements, etc.)
+     */
+    @Transactional
+    public void updateUserProgress(User user) {
+        progressService.updateAllChallengeProgress(user);
     }
 }

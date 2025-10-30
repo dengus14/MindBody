@@ -1,6 +1,6 @@
 package com.app.mindbody.models;
 
-
+import com.app.mindbody.enums.ChallengeType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,18 +8,26 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.threeten.extra.YearWeek;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_challenge")
+@Table(name = "user_challenges",
+        indexes = {
+                @Index(name = "idx_user_challenge_date", columnList = "user_id, assigned_date"),
+                @Index(name = "idx_user_challenge_week", columnList = "user_id, assigned_week_year, assigned_week_number"),
+                @Index(name = "idx_user_completed", columnList = "user_id, completed")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_user_challenge_daily", columnNames = {"user_id", "challenge_id", "assigned_date"}),
+                @UniqueConstraint(name = "uk_user_challenge_weekly", columnNames = {"user_id", "challenge_id", "assigned_week_year", "assigned_week_number"})
+        }
+)
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class) // otherwise @CreatedDate and @LastModifiedDate won't populate
+@EntityListeners(AuditingEntityListener.class)
 public class UserChallenge {
 
     @Id
@@ -30,14 +38,41 @@ public class UserChallenge {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "challenge_id", nullable = false)
     private Challenge challenge;
 
     @CreatedDate
-    private LocalDate assignedDate;  // for dailies
-    private YearWeek assignedWeek;   // for weeklies (or just LocalDate start of week)
+    @Column(name = "assigned_at", nullable = false)
+    private LocalDate assignedAt;
 
+    // For DAILY challenges
+    @Column(name = "assigned_date")
+    private LocalDate assignedDate;
 
+    // For WEEKLY challenges (store year + week number separately)
+    @Column(name = "assigned_week_year")
+    private Integer assignedWeekYear;
+
+    @Column(name = "assigned_week_number")
+    private Integer assignedWeekNumber;
+
+    @Column(name = "completed", nullable = false)
     private boolean completed;
+
+    @Column(name = "current_progress", nullable = false)
+    private Integer currentProgress = 0;
+
+    @Column(name = "claimed", nullable = false)
+    private boolean claimed;
+
+    @Column(name = "claimed_at")
+    private LocalDate claimedAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (currentProgress == null) currentProgress = 0;
+        if (!completed) completed = false;
+        if (!claimed) claimed = false;
+    }
 }
