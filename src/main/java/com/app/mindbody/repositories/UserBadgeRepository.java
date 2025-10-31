@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface UserBadgeRepository extends JpaRepository<UserBadge, Long> {
     Optional<UserBadge> findByUserProfileAndBadge(UserProfile userProfile, Badge badge);
-    List<UserBadge> findAllByUser(User user);
+    List<UserBadge> findAllByUserProfile(UserProfile userProfile);
 
 
 }

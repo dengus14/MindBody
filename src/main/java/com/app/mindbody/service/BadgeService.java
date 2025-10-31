@@ -5,9 +5,9 @@ import com.app.mindbody.config.JwtService;
 import com.app.mindbody.dto.BadgeDTO;
 import com.app.mindbody.dto.BadgeProgressDTO;
 import com.app.mindbody.models.Badge;
-import com.app.mindbody.repositories.BadgeRepository;
-import com.app.mindbody.repositories.UserBadgeRepository;
-import com.app.mindbody.repositories.UserRepository;
+import com.app.mindbody.models.UserAuth;
+import com.app.mindbody.models.UserProfile;
+import com.app.mindbody.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,8 @@ public class BadgeService {
 
 
     private final BadgeRepository badgeRepository;
-    private final UserRepository userRepository;
+    private final UserAuthRepository userAuthRepository;
+    private final UserProfileRepository userProfileRepository;
     private final UserBadgeRepository userBadgeRepository;
     private final JwtService jwtService;
     private final BadgeServiceCalculator badgeServiceCalculator;
@@ -44,12 +45,16 @@ public class BadgeService {
 
 
         String username = jwtService.extractUsername(token);
-        var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+
+        UserAuth auth = userAuthRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        UserProfile profile = userProfileRepository.findByAuth(auth)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
         List<Badge> allBadges = badgeRepository.findAllByOrderByRequirementValueAsc();
         List<BadgeDTO> retList = new ArrayList<BadgeDTO>();
 
         for (Badge badge : allBadges) {
-            int progrValue = badgeServiceCalculator.getProgressValue(badge, user);
+            int progrValue = badgeServiceCalculator.getProgressValue(badge, profile);
             BadgeDTO toList = BadgeDTO.fromEntity(badge, progrValue);
             retList.add(toList);
         }
