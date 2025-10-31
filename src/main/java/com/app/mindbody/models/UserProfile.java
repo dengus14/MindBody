@@ -1,10 +1,7 @@
 package com.app.mindbody.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -14,6 +11,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = "auth")
 public class UserProfile {
 
     @Id
@@ -43,6 +41,7 @@ public class UserProfile {
         if (totalMinutes == null) totalMinutes = 0;
         if (totalWorkouts == null) totalWorkouts = 0;
         if (totalCaloriesBurned == null) totalCaloriesBurned = 0;
+        if (longestWorkout == null) longestWorkout = 0;
         if (totalMornings == null) totalMornings = 0;
         if (totalEvenings == null) totalEvenings = 0;
     }

@@ -1,18 +1,15 @@
 package com.app.mindbody.dto;
 
-import com.app.mindbody.enums.WorkoutTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddWorkoutDTO {
-    private WorkoutTypeEnum workoutType;
-    private int durationMinutes;
-    private String notes;
+public class UserFullDTO {
+    private UserAuthDTO auth;
+    private UserProfileDTO profile;
 }
