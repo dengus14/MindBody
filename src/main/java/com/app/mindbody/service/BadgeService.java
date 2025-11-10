@@ -25,7 +25,7 @@ public class BadgeService {
     private final BadgeRepository badgeRepository;
     private final UserAuthRepository userAuthRepository;
     private final UserProfileRepository userProfileRepository;
-    private final UserBadgeRepository userBadgeRepository;
+    private final UserBadgeService userBadgeService;
     private final JwtService jwtService;
     private final BadgeServiceCalculator badgeServiceCalculator;
 
@@ -53,31 +53,6 @@ public class BadgeService {
     public void awardBadges(UserProfile profile) {
         log.debug("Evaluating badges for userProfile id={}", profile.getId());
         List<Badge> badges = badgeRepository.findAllByOrderByRequirementValueAsc();
-
-        for (Badge badge : badges) {
-            boolean alreadyHas = userBadgeRepository
-                    .findByUserProfileAndBadge(profile, badge)
-                    .isPresent();
-            if (alreadyHas) continue;
-
-            boolean qualifies = switch (badge.getRequirement_type()) {
-                case STREAK -> profile.getStreakCount() >= badge.getRequirementValue();
-                case WORKOUT_COUNT -> profile.getTotalWorkouts() >= badge.getRequirementValue();
-                case DURATION -> profile.getLongestWorkout() >= badge.getRequirementValue();
-                case TOTAL_DURATION -> profile.getTotalMinutes() >= badge.getRequirementValue();
-                case MORNING_WORKOUTS -> profile.getTotalMornings() >= badge.getRequirementValue();
-                case EVENING_WORKOUTS -> profile.getTotalEvenings() >= badge.getRequirementValue();
-                default -> false;
-            };
-
-            if (qualifies) {
-                log.info("UserProfile {} earned badge '{}'", profile.getId(), badge.getBadge_name());
-                UserBadge earned = UserBadge.builder()
-                        .userProfile(profile)
-                        .badge(badge)
-                        .build();
-                userBadgeRepository.save(earned);
-            }
-        }
+        userBadgeService.updateEarned(badges, profile);
     }
 }

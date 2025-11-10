@@ -46,8 +46,6 @@ public class WorkoutService {
                     return new RuntimeException("Profile not found");
                 });
 
-
-        // ---- save workout ----
         Workout workout = Workout.builder()
                 .userProfile(profile)
                 .durationMinutes(request.getDurationMinutes())
