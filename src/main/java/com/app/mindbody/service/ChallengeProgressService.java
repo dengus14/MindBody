@@ -2,7 +2,7 @@ package com.app.mindbody.service;
 
 import com.app.mindbody.models.UserChallenge;
 import com.app.mindbody.models.UserProfile;
-import com.app.mindbody.repositories.UserChallengeRepository;
+import com.app.mindbody.repositories.UserProfileChallengeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,13 +16,13 @@ import java.util.List;
 @Slf4j
 public class ChallengeProgressService {
 
-    private final UserChallengeRepository userChallengeRepository;
+    private final UserProfileChallengeRepository userProfileChallengeRepository;
     private final ChallengeCalculator challengeCalculator;
 
 
     @Transactional
     public void updateAllChallengeProgress(UserProfile user) {
-        List<UserChallenge> activeChallenges = userChallengeRepository
+        List<UserChallenge> activeChallenges = userProfileChallengeRepository
                 .findAllByUserProfile(user)
                 .stream()
                 .filter(uc -> !uc.isCompleted())
@@ -33,7 +33,7 @@ public class ChallengeProgressService {
         }
 
         if (!activeChallenges.isEmpty()) {
-            userChallengeRepository.saveAll(activeChallenges);
+            userProfileChallengeRepository.saveAll(activeChallenges);
             log.info("Updated progress for {} active challenges for user {}",
                     activeChallenges.size(), user.getAuth().getUsername());
         }

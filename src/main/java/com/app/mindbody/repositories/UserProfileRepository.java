@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface UserProfileRepository extends JpaRepository<UserProfile,Long> {
     Optional<UserProfile> findByAuth(UserAuth auth);
-    List<UserProfile> findByAllByAuth();
+    List<UserProfile> findAll();
     List<UserProfile> findTop50ByOrderByPointsDesc();
 }

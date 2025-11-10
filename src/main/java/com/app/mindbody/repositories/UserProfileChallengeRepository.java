@@ -4,7 +4,6 @@ import com.app.mindbody.enums.ChallengeType;
 import com.app.mindbody.models.Challenge;
 import com.app.mindbody.models.UserProfile;
 import com.app.mindbody.models.UserChallenge;
-import com.app.mindbody.models.UserProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,9 +12,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserChallengeRepository extends JpaRepository<UserChallenge, Long> {
+public interface UserProfileChallengeRepository extends JpaRepository<UserChallenge, Long> {
 
-    Optional<UserChallenge> findByUserAndChallenge(UserProfile user, Challenge challenge);
+    Optional<UserChallenge> findByUserProfileAndChallenge(UserProfile user, Challenge challenge);
 
     List<UserChallenge> findAllByUserProfile(UserProfile user);
 
@@ -26,7 +25,7 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
             LocalDate assignedDate
     );
 
-    List<UserChallenge> findAllByUserAndAssignedDate(UserProfile user, LocalDate assignedDate);
+    List<UserChallenge> findAllByUserProfileAndAssignedDate(UserProfile user, LocalDate assignedDate);
 
     // Weekly challenges
     boolean existsByUserProfileAndChallenge_TypeAndAssignedWeekYearAndAssignedWeekNumber(
@@ -36,7 +35,7 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
             Integer weekNumber
     );
 
-    List<UserChallenge> findAllByUserAndAssignedWeekYearAndAssignedWeekNumber(
+    List<UserChallenge> findAllByUserProfileAndAssignedWeekYearAndAssignedWeekNumber(
             UserProfile user,
             Integer year,
             Integer weekNumber
@@ -44,7 +43,7 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
 
     // Get recently assigned challenge IDs (last N days for dailies, last N weeks for weeklies)
     @Query("SELECT uc.challenge.id FROM UserChallenge uc " +
-            "WHERE uc.user = :user " +
+            "WHERE uc.userProfile = :user " +
             "AND uc.challenge.type = :type " +
             "AND uc.assignedDate >= :since")
     List<Integer> findRecentChallengeIds(
@@ -58,7 +57,7 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
 
     // Get active challenges (assigned today/this week, not completed or completed but unclaimed)
     @Query("SELECT uc FROM UserChallenge uc " +
-            "WHERE uc.user = :user " +
+            "WHERE uc.userProfile = :user " +
             "AND uc.assignedDate = :date " +
             "AND (uc.completed = false OR (uc.completed = true AND uc.claimed = false))")
     List<UserChallenge> findActiveDailyChallenges(
@@ -67,7 +66,7 @@ public interface UserChallengeRepository extends JpaRepository<UserChallenge, Lo
     );
 
     @Query("SELECT uc FROM UserChallenge uc " +
-            "WHERE uc.user = :user " +
+            "WHERE uc.userProfile = :user " +
             "AND uc.assignedWeekYear = :year " +
             "AND uc.assignedWeekNumber = :weekNumber " +
             "AND (uc.completed = false OR (uc.completed = true AND uc.claimed = false))")
