@@ -50,12 +50,12 @@ public class ChallengeCalculator {
         }
 
         // Morning workout challenges
-        if (lowerName.contains("morning")) {
+        if (lowerName.contains("AM") || lowerName.contains("morning")) {
             return calculateMorningWorkouts(user);
         }
 
         // Evening workout challenges
-        if (lowerName.contains("evening")) {
+        if (lowerName.contains("evening") || lowerName.contains("PM")) {
             return calculateEveningWorkouts(user);
         }
 
@@ -92,7 +92,7 @@ public class ChallengeCalculator {
         List<Workout> workouts = workoutRepository.findByUserOrderByCreatedAtDesc(user);
 
         long morningCount = workouts.stream()
-                .filter(w -> w.getCreatedAt() != null && w.getCreatedAt().toLocalTime().isBefore(LocalTime.NOON))
+                .filter(w -> w.getCreatedAt() != null && (w.getCreatedAt().toLocalTime().isAfter(LocalTime.of(23, 59)) && w.getCreatedAt().toLocalTime().isBefore(LocalTime.of(11, 59))))
                 .count();
 
         return (int) morningCount;
@@ -102,7 +102,7 @@ public class ChallengeCalculator {
         List<Workout> workouts = workoutRepository.findByUserOrderByCreatedAtDesc(user);
 
         long eveningCount = workouts.stream()
-                .filter(w -> w.getCreatedAt() != null && w.getCreatedAt().toLocalTime().isAfter(LocalTime.of(18, 0)))
+                .filter(w -> w.getCreatedAt() != null && (w.getCreatedAt().toLocalTime().isAfter(LocalTime.of(12, 0)) && w.getCreatedAt().toLocalTime().isBefore(LocalTime.of(23, 59))))
                 .count();
 
         return (int) eveningCount;

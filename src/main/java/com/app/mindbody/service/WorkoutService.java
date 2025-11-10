@@ -30,35 +30,11 @@ public class WorkoutService {
     private final JwtService jwtService;
     private final WorkoutRepository workoutRepository;
     private final UserRepository userRepository;
-    private final BadgeRepository badgeRepository;
-    private final UserBadgeRepository userBadgeRepository;
+    private final BadgeService badgeService;
     private final ChallengeProgressService challengeProgressService; // Add this
+    private final UserStatsService userStatsService;
 
-    private void awardBadges(User user) {
-        List<Badge> badgesList = badgeRepository.findAllByOrderByRequirementValueAsc();
 
-        for (Badge badge : badgesList) {
-            boolean alreadyHasBadge = userBadgeRepository.findByUserAndBadge(user, badge).isPresent();
-            if (alreadyHasBadge) continue;
-
-            boolean qualifies = switch (badge.getRequirement_type()) {
-                case STREAK -> user.getStreak_count() >= badge.getRequirementValue();
-                case WORKOUT_COUNT -> user.getTotalWorkouts() >= badge.getRequirementValue();
-                case DURATION -> user.getLongest_workout() >= badge.getRequirementValue();
-                case TOTAL_DURATION -> user.getTotalMinutes() >= badge.getRequirementValue();
-                case MORNING_WORKOUTS -> user.getTotalMornings() >= badge.getRequirementValue();
-                case EVENING_WORKOUTS -> user.getTotalEvenings() >= badge.getRequirementValue();
-                default -> false;
-            };
-
-            if (qualifies) {
-                UserBadge userBadge = new UserBadge();
-                userBadge.setUser(user);
-                userBadge.setBadge(badge);
-                userBadgeRepository.save(userBadge);
-            }
-        }
-    }
 
     public String addWorkout(AddWorkoutDTO request, String token) {
         // Retrieve user from JWT token
@@ -89,13 +65,6 @@ public class WorkoutService {
             }
         }
 
-        //  Workout + stats updates
-        user.setLast_workout(LocalDate.now());
-        user.setTotalMinutes(user.getTotalMinutes() + request.getDurationMinutes());
-        user.setPoints(user.getPoints() + 10);
-        user.setLongest_workout(Math.max(user.getLongest_workout(), request.getDurationMinutes()));
-        user.setTotalWorkouts(user.getTotalWorkouts() + 1);
-
         // Morning/evening counts
         int hour = LocalDateTime.now().getHour();
         if (hour >= 5 && hour < 12) {
@@ -103,14 +72,6 @@ public class WorkoutService {
         } else {
             user.setTotalEvenings(user.getTotalEvenings() + 1);
         }
-
-        userRepository.save(user);
-
-        // Award badges based on updated stats
-        awardBadges(user);
-
-
-
         //  Save workout record
         Workout workout = Workout.builder()
                 .user(user)
@@ -119,8 +80,9 @@ public class WorkoutService {
                 .notes(request.getNotes())
                 .build();
 
+        userStatsService.updateStatsForNewWorkout(user,request);
+        badgeService.awardBadges(user);
         workoutRepository.save(workout);
-        // Update challenge progress after user stats are updated
         challengeProgressService.updateAllChallengeProgress(user);
 
         return workout.toString();
