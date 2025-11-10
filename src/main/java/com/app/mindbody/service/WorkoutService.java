@@ -55,9 +55,9 @@ public class WorkoutService {
         workoutRepository.save(workout);
 
         streakCountService.updateStreakForWorkout(profile);
-        badgeService.awardBadges(profile);
         userProfileService.updateStatsForNewWorkout(profile,request);
         userProfileRepository.save(profile);
+        badgeService.awardBadges(profile);
         log.info("Workout saved (id={}) for user={}", workout.getId());
         return workout.toString();
     }
