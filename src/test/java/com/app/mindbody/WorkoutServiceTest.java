@@ -3,7 +3,6 @@ package com.app.mindbody;
 import com.app.mindbody.config.JwtService;
 import com.app.mindbody.dto.WorkoutHistoryDTO;
 import com.app.mindbody.enums.WorkoutTypeEnum;
-import com.app.mindbody.models.User;
 import com.app.mindbody.models.Workout;
 import com.app.mindbody.repositories.UserRepository;
 import com.app.mindbody.repositories.WorkoutRepository;

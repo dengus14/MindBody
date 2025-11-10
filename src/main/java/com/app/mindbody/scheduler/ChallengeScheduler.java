@@ -1,7 +1,7 @@
 package com.app.mindbody.scheduler;
 
-import com.app.mindbody.models.User;
-import com.app.mindbody.repositories.UserRepository;
+import com.app.mindbody.models.UserProfile;
+import com.app.mindbody.repositories.UserProfileRepository;
 import com.app.mindbody.service.ChallengeAssignmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 public class ChallengeScheduler {
 
-    private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
     private final ChallengeAssignmentService assignmentService;
 
 
@@ -25,14 +25,14 @@ public class ChallengeScheduler {
         log.info("Starting daily challenge assignment job");
         LocalDate today = LocalDate.now();
 
-        List<User> allUsers = userRepository.findAll();
+        List<UserProfile> allUsers = userProfileRepository.findAll();
 
-        for (User user : allUsers) {
+        for (UserProfile user : allUsers) {
             try {
                 assignmentService.assignDailyChallenges(user, today);
             } catch (Exception e) {
                 log.error("Failed to assign daily challenges for user {}: {}",
-                        user.getUsername(), e.getMessage());
+                        user.getAuth().getUsername(), e.getMessage());
             }
         }
 
@@ -45,14 +45,14 @@ public class ChallengeScheduler {
         log.info("Starting weekly challenge assignment job");
         LocalDate today = LocalDate.now();
 
-        List<User> allUsers = userRepository.findAll();
+        List<UserProfile> allUsers = userProfileRepository.findAll();
 
-        for (User user : allUsers) {
+        for (UserProfile user : allUsers) {
             try {
                 assignmentService.assignWeeklyChallenges(user, today);
             } catch (Exception e) {
                 log.error("Failed to assign weekly challenges for user {}: {}",
-                        user.getUsername(), e.getMessage());
+                        user.getAuth().getUsername(), e.getMessage());
             }
         }
 

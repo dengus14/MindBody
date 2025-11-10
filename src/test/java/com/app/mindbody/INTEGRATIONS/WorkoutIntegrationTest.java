@@ -3,7 +3,6 @@ package com.app.mindbody.INTEGRATIONS;
 import com.app.mindbody.config.ApplicationConfig;
 import com.app.mindbody.dto.*;
 import com.app.mindbody.enums.WorkoutTypeEnum;
-import com.app.mindbody.models.User;
 import com.app.mindbody.models.Workout;
 import com.app.mindbody.repositories.UserRepository;
 import com.app.mindbody.repositories.WorkoutRepository;

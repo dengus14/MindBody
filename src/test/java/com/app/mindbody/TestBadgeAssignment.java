@@ -4,7 +4,6 @@ import com.app.mindbody.config.JwtService;
 import com.app.mindbody.dto.AddWorkoutDTO;
 import com.app.mindbody.enums.RequirementTypeEnums;
 import com.app.mindbody.models.Badge;
-import com.app.mindbody.models.User;
 import com.app.mindbody.models.UserBadge;
 import com.app.mindbody.repositories.*;
 import com.app.mindbody.service.WorkoutService;

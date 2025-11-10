@@ -3,7 +3,7 @@ package com.app.mindbody.controllers;
 import com.app.mindbody.dto.ChallengeDTO;
 import com.app.mindbody.dto.ClaimChallengeRequest;
 import com.app.mindbody.dto.ClaimChallengeResponse;
-import com.app.mindbody.models.User;
+import com.app.mindbody.models.UserProfile;
 import com.app.mindbody.service.ChallengeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class ChallengeController {
      */
     @GetMapping("/active")
     public ResponseEntity<List<ChallengeDTO>> getActiveChallenges(
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserProfile user
     ) {
         // Ensure challenges are assigned for today/this week
         challengeService.ensureChallengesAssigned(user);
@@ -41,7 +41,7 @@ public class ChallengeController {
     @PostMapping("/claim")
     public ResponseEntity<ClaimChallengeResponse> claimChallenge(
             @RequestBody ClaimChallengeRequest request,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserProfile user
     ) {
         ClaimChallengeResponse response = challengeService.claimChallenge(request, user);
 
