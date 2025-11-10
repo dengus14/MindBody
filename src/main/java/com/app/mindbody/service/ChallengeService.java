@@ -3,8 +3,8 @@ package com.app.mindbody.service;
 import com.app.mindbody.dto.ChallengeDTO;
 import com.app.mindbody.dto.ClaimChallengeRequest;
 import com.app.mindbody.dto.ClaimChallengeResponse;
-import com.app.mindbody.models.User;
 import com.app.mindbody.models.UserChallenge;
+import com.app.mindbody.models.UserProfile;
 import com.app.mindbody.repositories.UserChallengeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ public class ChallengeService {
      * Get user's active challenges (daily + weekly for current period)
      */
     @Transactional(readOnly = true)
-    public List<ChallengeDTO> getActiveChallenges(User user) {
+    public List<ChallengeDTO> getActiveChallenges(UserProfile user) {
         LocalDate today = LocalDate.now();
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
         int year = today.get(weekFields.weekBasedYear());
@@ -54,7 +54,7 @@ public class ChallengeService {
      * Ensure user has challenges assigned for today/this week
      */
     @Transactional
-    public void ensureChallengesAssigned(User user) {
+    public void ensureChallengesAssigned(UserProfile user) {
         LocalDate today = LocalDate.now();
         assignmentService.assignDailyChallenges(user, today);
         assignmentService.assignWeeklyChallenges(user, today);
@@ -64,7 +64,7 @@ public class ChallengeService {
      * Claim a completed challenge
      */
     @Transactional
-    public ClaimChallengeResponse claimChallenge(ClaimChallengeRequest request, User user) {
+    public ClaimChallengeResponse claimChallenge(ClaimChallengeRequest request, UserProfile user) {
         return completionService.claimChallenge(request.getUserChallengeId(), user);
     }
 
@@ -72,7 +72,7 @@ public class ChallengeService {
      * Update challenge progress for a user (call after workouts, achievements, etc.)
      */
     @Transactional
-    public void updateUserProgress(User user) {
+    public void updateUserProgress(UserProfile user) {
         progressService.updateAllChallengeProgress(user);
     }
 }

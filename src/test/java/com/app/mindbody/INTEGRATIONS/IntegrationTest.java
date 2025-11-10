@@ -4,7 +4,6 @@ import com.app.mindbody.dto.LoginDTO;
 import com.app.mindbody.dto.RegisterDTO;
 import com.app.mindbody.controllers.AuthenticationResponse;
 import com.app.mindbody.enums.UserRoleEnums;
-import com.app.mindbody.models.User;
 import com.app.mindbody.repositories.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;

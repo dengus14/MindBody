@@ -4,7 +4,6 @@ import com.app.mindbody.models.Badge;
 import com.app.mindbody.models.UserBadge;
 import com.app.mindbody.models.UserProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.app.mindbody.models.User;
 
 import java.util.List;
 import java.util.Optional;

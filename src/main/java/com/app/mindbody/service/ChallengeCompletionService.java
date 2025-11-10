@@ -1,10 +1,10 @@
 package com.app.mindbody.service;
 
 import com.app.mindbody.dto.ClaimChallengeResponse;
-import com.app.mindbody.models.User;
 import com.app.mindbody.models.UserChallenge;
+import com.app.mindbody.models.UserProfile;
 import com.app.mindbody.repositories.UserChallengeRepository;
-import com.app.mindbody.repositories.UserRepository;
+import com.app.mindbody.repositories.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,10 +18,10 @@ import java.time.LocalDate;
 public class ChallengeCompletionService {
 
     private final UserChallengeRepository userChallengeRepository;
-    private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
 
     @Transactional
-    public ClaimChallengeResponse claimChallenge(Long userChallengeId, User user) {
+    public ClaimChallengeResponse claimChallenge(Long userChallengeId, UserProfile user) {
         UserChallenge userChallenge = userChallengeRepository.findById(userChallengeId)
                 .orElseThrow(() -> new RuntimeException("Challenge not found"));
 
@@ -58,10 +58,10 @@ public class ChallengeCompletionService {
         userChallenge.setClaimedAt(LocalDate.now());
 
         userChallengeRepository.save(userChallenge);
-        userRepository.save(user);
+        userProfileRepository.save(user);
 
         log.info("User {} claimed challenge {} and earned {} points",
-                user.getUsername(),
+                user.getAuth().getUsername(),
                 userChallenge.getChallenge().getChallengeName(),
                 pointsAwarded);
 
