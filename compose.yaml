@@ -1,9 +1,18 @@
+version: '3.8'
+
 services:
   postgres:
-    image: 'postgres:latest'
+    image: postgres:latest
+    container_name: mindbody-postgres
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      POSTGRES_DB: mindbodydb
+      POSTGRES_USER: minduser
+      POSTGRES_PASSWORD: mindpass
     ports:
-      - '5433:5432'
+      - "5433:5432"
+    volumes:
+      - mindbody-data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  mindbody-data:

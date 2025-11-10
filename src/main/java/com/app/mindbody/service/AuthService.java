@@ -9,7 +9,6 @@ import com.app.mindbody.models.UserAuth;
 import com.app.mindbody.models.UserProfile;
 import com.app.mindbody.repositories.UserAuthRepository;
 import com.app.mindbody.repositories.UserProfileRepository;
-import com.app.mindbody.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 

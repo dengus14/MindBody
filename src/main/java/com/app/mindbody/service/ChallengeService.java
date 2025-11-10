@@ -5,7 +5,8 @@ import com.app.mindbody.dto.ClaimChallengeRequest;
 import com.app.mindbody.dto.ClaimChallengeResponse;
 import com.app.mindbody.models.UserChallenge;
 import com.app.mindbody.models.UserProfile;
-import com.app.mindbody.repositories.UserChallengeRepository;
+import com.app.mindbody.repositories.UserProfileChallengeRepository;
+import com.app.mindbody.repositories.UserProfileRepository; // Add this import
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ChallengeService {
 
-    private final UserChallengeRepository userChallengeRepository;
+    private final UserProfileChallengeRepository userProfileChallengeRepository;
+    private final UserProfileRepository userProfileRepository; // Add this
     private final ChallengeAssignmentService assignmentService;
     private final ChallengeCompletionService completionService;
     private final ChallengeProgressService progressService;
@@ -38,8 +40,8 @@ public class ChallengeService {
         int year = today.get(weekFields.weekBasedYear());
         int weekNumber = today.get(weekFields.weekOfWeekBasedYear());
 
-        List<UserChallenge> dailies = userChallengeRepository.findActiveDailyChallenges(user, today);
-        List<UserChallenge> weeklies = userChallengeRepository.findActiveWeeklyChallenges(user, year, weekNumber);
+        List<UserChallenge> dailies = userProfileChallengeRepository.findActiveDailyChallenges(user, today);
+        List<UserChallenge> weeklies = userProfileChallengeRepository.findActiveWeeklyChallenges(user, year, weekNumber);
 
         List<UserChallenge> allActive = new ArrayList<>();
         allActive.addAll(dailies);
@@ -55,9 +57,17 @@ public class ChallengeService {
      */
     @Transactional
     public void ensureChallengesAssigned(UserProfile user) {
+        // ✅ FIX: Reload the UserProfile from database to ensure it's managed and has valid ID
+        UserProfile managedUser = userProfileRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalStateException("User profile not found: " + user.getId()));
+
+        log.debug("Ensuring challenges for user ID: {}, username: {}",
+                managedUser.getId(),
+                managedUser.getAuth() != null ? managedUser.getAuth().getUsername() : "unknown");
+
         LocalDate today = LocalDate.now();
-        assignmentService.assignDailyChallenges(user, today);
-        assignmentService.assignWeeklyChallenges(user, today);
+        assignmentService.assignDailyChallenges(managedUser, today);
+        assignmentService.assignWeeklyChallenges(managedUser, today);
     }
 
     /**
