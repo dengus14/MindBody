@@ -1,3 +1,7 @@
+<img width="1909" height="944" alt="image" src="https://github.com/user-attachments/assets/5b7a317a-6620-4cf4-8bd1-d39e8977c504" />
+
+
+
 # Mind & Body Achievement based Gym Platform - Backend
 
 A Spring Boot REST API for tracking workouts, managing achievements, and gamifying fitness goals. Provides JWT authentication, workout logging (PUSH/PULL/LEGS), badge system, daily challenges, and leaderboard functionality for the Mind & Body fitness tracking application.
