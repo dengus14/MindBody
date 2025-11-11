@@ -25,10 +25,24 @@ cd backend-mind-body
 docker-compose up -d
 ```
 
-3. **Run the application**
+3. **application.properties** SETUP THIS FILE
+spring.application.name=MindBody
+
+spring.datasource.url=jdbc:postgresql://localhost:5433/mindbodydb
+spring.datasource.username=minduser
+spring.datasource.password=mindpass
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+app.jwt.secret=f7a4b3c8e2d9f0164ab72c9159d83ef5c1a0e43d9b87f5e2d6a1c4b7f0e8a9d3
+
+
+4. **Run the application**
 ```bash
 mvn spring-boot:run
 ```
+
 
 API will be available at `http://localhost:8080`
 
