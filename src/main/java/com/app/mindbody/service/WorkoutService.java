@@ -4,166 +4,103 @@ import com.app.mindbody.config.JwtService;
 import com.app.mindbody.dto.AddWorkoutDTO;
 import com.app.mindbody.dto.EditWorkoutDTO;
 import com.app.mindbody.dto.WorkoutHistoryDTO;
-import com.app.mindbody.enums.WorkoutTypeEnum;
-import com.app.mindbody.models.Badge;
-import com.app.mindbody.models.User;
-import com.app.mindbody.models.UserBadge;
-import com.app.mindbody.models.Workout;
-import com.app.mindbody.repositories.BadgeRepository;
-import com.app.mindbody.repositories.UserBadgeRepository;
-import com.app.mindbody.repositories.UserRepository;
-import com.app.mindbody.repositories.WorkoutRepository;
+import com.app.mindbody.models.*;
+import com.app.mindbody.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WorkoutService {
+
     private final JwtService jwtService;
     private final WorkoutRepository workoutRepository;
-    private final UserRepository userRepository;
-    private final BadgeRepository badgeRepository;
-    private final UserBadgeRepository userBadgeRepository;
-    private final ChallengeProgressService challengeProgressService; // Add this
+    private final UserAuthRepository userAuthRepository;
+    private final UserProfileRepository userProfileRepository;
+    private final BadgeService badgeService;
+    private final UserProfileService userProfileService;
+    private final StreakCountService streakCountService;
+    private final ChallengeProgressService challengeProgressService;
 
-    private void awardBadges(User user) {
-        List<Badge> badgesList = badgeRepository.findAllByOrderByRequirementValueAsc();
-
-        for (Badge badge : badgesList) {
-            boolean alreadyHasBadge = userBadgeRepository.findByUserAndBadge(user, badge).isPresent();
-            if (alreadyHasBadge) continue;
-
-            boolean qualifies = switch (badge.getRequirement_type()) {
-                case STREAK -> user.getStreak_count() >= badge.getRequirementValue();
-                case WORKOUT_COUNT -> user.getTotalWorkouts() >= badge.getRequirementValue();
-                case DURATION -> user.getLongest_workout() >= badge.getRequirementValue();
-                case TOTAL_DURATION -> user.getTotalMinutes() >= badge.getRequirementValue();
-                case MORNING_WORKOUTS -> user.getTotalMornings() >= badge.getRequirementValue();
-                case EVENING_WORKOUTS -> user.getTotalEvenings() >= badge.getRequirementValue();
-                default -> false;
-            };
-
-            if (qualifies) {
-                UserBadge userBadge = new UserBadge();
-                userBadge.setUser(user);
-                userBadge.setBadge(badge);
-                userBadgeRepository.save(userBadge);
-            }
-        }
+    private UserAuth getAuth(String token) {
+        String username = jwtService.extractUsername(token);
+        return userAuthRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    log.error("UserAuth not found for username={}", username);
+                    return new RuntimeException("User not found");
+                });
     }
 
+    /** Add new workout */
+    @Transactional
     public String addWorkout(AddWorkoutDTO request, String token) {
-        // Retrieve user from JWT token
-        String username = jwtService.extractUsername(token);
-        var user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        log.info("Adding new workout for token={}", token.substring(0, Math.min(10, token.length())));
 
-        //  Defensive null guards
-        user.setStreak_count(user.getStreak_count() == null ? 0 : user.getStreak_count());
-        user.setLongest_streak(user.getLongest_streak() == null ? 0 : user.getLongest_streak());
-        user.setLongest_workout(user.getLongest_workout() == null ? 0 : user.getLongest_workout());
-        user.setTotalMinutes(user.getTotalMinutes() == null ? 0 : user.getTotalMinutes());
-        user.setPoints(user.getPoints() == null ? 0 : user.getPoints());
-        user.setTotalWorkouts(user.getTotalWorkouts() == null ? 0 : user.getTotalWorkouts());
-        user.setTotalMornings(user.getTotalMornings() == null ? 0 : user.getTotalMornings());
-        user.setTotalEvenings(user.getTotalEvenings() == null ? 0 : user.getTotalEvenings());
+        UserAuth auth = getAuth(token);
+        UserProfile profile = userProfileRepository.findByAuth(auth)
+                .orElseThrow(() -> {
+                    log.error("UserProfile missing for auth id={}", auth.getId());
+                    return new RuntimeException("Profile not found");
+                });
 
-        //  Update streak count
-        if (user.getLast_workout() != null && LocalDate.now().equals(user.getLast_workout().plusDays(1))) {
-            user.setStreak_count(user.getStreak_count() + 1);
-            if (user.getStreak_count() >= user.getLongest_streak()) {
-                user.setLongest_streak(user.getStreak_count());
-            }
-        } else if (user.getLast_workout() == null || !LocalDate.now().equals(user.getLast_workout())) {
-            user.setStreak_count(1);
-            if (user.getLongest_streak() < 1) {
-                user.setLongest_streak(1);
-            }
-        }
-
-        //  Workout + stats updates
-        user.setLast_workout(LocalDate.now());
-        user.setTotalMinutes(user.getTotalMinutes() + request.getDurationMinutes());
-        user.setPoints(user.getPoints() + 10);
-        user.setLongest_workout(Math.max(user.getLongest_workout(), request.getDurationMinutes()));
-        user.setTotalWorkouts(user.getTotalWorkouts() + 1);
-
-        // Morning/evening counts
-        int hour = LocalDateTime.now().getHour();
-        if (hour >= 5 && hour < 12) {
-            user.setTotalMornings(user.getTotalMornings() + 1);
-        } else {
-            user.setTotalEvenings(user.getTotalEvenings() + 1);
-        }
-
-        userRepository.save(user);
-
-        // Award badges based on updated stats
-        awardBadges(user);
-
-
-
-        //  Save workout record
         Workout workout = Workout.builder()
-                .user(user)
+                .userProfile(profile)
                 .durationMinutes(request.getDurationMinutes())
                 .workoutType(request.getWorkoutType())
                 .notes(request.getNotes())
                 .build();
-
         workoutRepository.save(workout);
-        // Update challenge progress after user stats are updated
-        challengeProgressService.updateAllChallengeProgress(user);
 
+        streakCountService.updateStreakForWorkout(profile);
+        userProfileService.updateStatsForNewWorkout(profile,request);
+        userProfileRepository.save(profile);
+        badgeService.awardBadges(profile);
+        challengeProgressService.updateAllChallengeProgress(profile);
+        log.info("Workout saved (id={}) for user={}", workout.getId());
         return workout.toString();
     }
 
-    public String editWorkout(EditWorkoutDTO request, String token){
-        String username = jwtService.extractUsername(token);
-        var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+    /** Edit existing workout */
+    public String editWorkout(EditWorkoutDTO request, String token) {
+        UserAuth auth = getAuth(token);
 
-        var workout = workoutRepository.findById(request.getId()).orElseThrow(() -> new RuntimeException("Workout not found"));
-
-        if(!workout.getUser().equals(user)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot edit someone else's workout");
-        }
+        Workout workout = workoutRepository.findById(request.getId())
+                .orElseThrow(() -> new RuntimeException("Workout not found"));
 
         workout.setDurationMinutes(request.getDurationMinutes());
         workout.setWorkoutType(request.getWorkoutType());
         workout.setNotes(request.getNotes());
         workoutRepository.save(workout);
+        log.info("Workout id={} updated successfully", workout.getId());
         return workout.toString();
     }
 
+    /** Remove workout */
     @Transactional
-    public String removeWorkout(EditWorkoutDTO request, String token){
-        String username = jwtService.extractUsername(token);
-        var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+    public String removeWorkout(EditWorkoutDTO request, String token) {
+        UserAuth auth = getAuth(token);
 
-        var workout = workoutRepository.findById(request.getId()).orElseThrow(() -> new RuntimeException("Workout not found"));
-
-        if(!workout.getUser().equals(user)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot remove someone else's workout");
-        }
+        Workout workout = workoutRepository.findById(request.getId())
+                .orElseThrow(() -> new RuntimeException("Workout not found"));
 
         workoutRepository.removeById(request.getId());
+        log.warn("Workout id={} removed by user={}", request.getId());
         return workout.toString();
     }
 
-    public List<WorkoutHistoryDTO> getHistory(String token){
-        String username = jwtService.extractUsername(token);
-        var user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+    /** Get workout history */
+    public List<WorkoutHistoryDTO> getHistory(String token) {
+        UserAuth auth = getAuth(token);
+        UserProfile profile = userProfileRepository.findByAuth(auth)
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
 
-        List<Workout> allWorkouts = workoutRepository.findByUserOrderByCreatedAtDesc(user);
-        return allWorkouts.stream()
+        List<Workout> workouts = workoutRepository.findByUserProfileOrderByCreatedAtDesc(profile);
+        log.debug("Found {} workouts for user={}", workouts.size());
+        return workouts.stream()
                 .map(WorkoutHistoryDTO::fromEntity)
                 .collect(Collectors.toList());
     }

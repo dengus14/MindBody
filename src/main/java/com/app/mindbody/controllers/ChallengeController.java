@@ -3,7 +3,9 @@ package com.app.mindbody.controllers;
 import com.app.mindbody.dto.ChallengeDTO;
 import com.app.mindbody.dto.ClaimChallengeRequest;
 import com.app.mindbody.dto.ClaimChallengeResponse;
-import com.app.mindbody.models.User;
+import com.app.mindbody.models.UserAuth;
+import com.app.mindbody.models.UserProfile;
+import com.app.mindbody.repositories.UserProfileRepository;
 import com.app.mindbody.service.ChallengeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,12 +21,17 @@ import java.util.List;
 public class ChallengeController {
 
     private final ChallengeService challengeService;
+    private final UserProfileRepository userProfileRepository;
 
 
     @GetMapping("/active")
     public ResponseEntity<List<ChallengeDTO>> getActiveChallenges(
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuth userAuth
     ) {
+        // ✅ Fetch UserProfile from database using UserAuth ID
+        UserProfile user = userProfileRepository.findById(userAuth.getId())
+                .orElseThrow(() -> new RuntimeException("User profile not found for user: " + userAuth.getUsername()));
+
         // Ensure challenges are assigned for today/this week
         challengeService.ensureChallengesAssigned(user);
 
@@ -36,8 +43,12 @@ public class ChallengeController {
     @PostMapping("/claim")
     public ResponseEntity<ClaimChallengeResponse> claimChallenge(
             @RequestBody ClaimChallengeRequest request,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal UserAuth userAuth
     ) {
+        // ✅ Fetch UserProfile from database
+        UserProfile user = userProfileRepository.findById(userAuth.getId())
+                .orElseThrow(() -> new RuntimeException("User profile not found for user: " + userAuth.getUsername()));
+
         ClaimChallengeResponse response = challengeService.claimChallenge(request, user);
 
         if (response.isSuccess()) {

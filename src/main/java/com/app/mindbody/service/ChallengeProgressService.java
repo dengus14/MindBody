@@ -1,8 +1,8 @@
 package com.app.mindbody.service;
 
-import com.app.mindbody.models.User;
 import com.app.mindbody.models.UserChallenge;
-import com.app.mindbody.repositories.UserChallengeRepository;
+import com.app.mindbody.models.UserProfile;
+import com.app.mindbody.repositories.UserProfileChallengeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,14 +16,14 @@ import java.util.List;
 @Slf4j
 public class ChallengeProgressService {
 
-    private final UserChallengeRepository userChallengeRepository;
+    private final UserProfileChallengeRepository userProfileChallengeRepository;
     private final ChallengeCalculator challengeCalculator;
 
 
     @Transactional
-    public void updateAllChallengeProgress(User user) {
-        List<UserChallenge> activeChallenges = userChallengeRepository
-                .findAllByUser(user)
+    public void updateAllChallengeProgress(UserProfile user) {
+        List<UserChallenge> activeChallenges = userProfileChallengeRepository
+                .findAllByUserProfile(user)
                 .stream()
                 .filter(uc -> !uc.isCompleted())
                 .toList();
@@ -33,13 +33,13 @@ public class ChallengeProgressService {
         }
 
         if (!activeChallenges.isEmpty()) {
-            userChallengeRepository.saveAll(activeChallenges);
+            userProfileChallengeRepository.saveAll(activeChallenges);
             log.info("Updated progress for {} active challenges for user {}",
-                    activeChallenges.size(), user.getUsername());
+                    activeChallenges.size(), user.getAuth().getUsername());
         }
     }
 
-    private void updateChallengeProgress(UserChallenge userChallenge, User user) {
+    private void updateChallengeProgress(UserChallenge userChallenge, UserProfile user) {
         // Calculate current progress based on user stats
         Integer currentProgress = challengeCalculator.calculateProgress(
                 user,
@@ -58,7 +58,7 @@ public class ChallengeProgressService {
             userChallenge.setCompleted(true);
             log.info("Challenge auto-completed: {} for user {}",
                     userChallenge.getChallenge().getChallengeName(),
-                    user.getUsername());
+                    user.getAuth().getUsername());
         }
     }
 }

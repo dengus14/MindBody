@@ -2,10 +2,10 @@ package com.app.mindbody.service;
 
 import com.app.mindbody.enums.ChallengeType;
 import com.app.mindbody.models.Challenge;
-import com.app.mindbody.models.User;
 import com.app.mindbody.models.UserChallenge;
+import com.app.mindbody.models.UserProfile;
 import com.app.mindbody.repositories.ChallengeRepository;
-import com.app.mindbody.repositories.UserChallengeRepository;
+import com.app.mindbody.repositories.UserProfileChallengeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,16 +29,17 @@ public class ChallengeAssignmentService {
     private static final int AVOID_RECENT_WEEKS = 4; // Don't repeat challenges from last 4 weeks
 
     private final ChallengeRepository challengeRepository;
-    private final UserChallengeRepository userChallengeRepository;
+    private final UserProfileChallengeRepository userProfileChallengeRepository;
 
 
     @Transactional
-    public void assignDailyChallenges(User user, LocalDate date) {
-        boolean alreadyAssigned = userChallengeRepository
-                .existsByUserAndChallenge_TypeAndAssignedDate(user, ChallengeType.DAILY, date);
+    public void assignDailyChallenges(UserProfile user, LocalDate date) {
+
+        boolean alreadyAssigned = userProfileChallengeRepository
+                .existsByUserProfileAndChallenge_TypeAndAssignedDate(user, ChallengeType.DAILY, date);
 
         if (alreadyAssigned) {
-            log.debug("Daily challenges already assigned for user {} on {}", user.getUsername(), date);
+            log.debug("Daily challenges already assigned for user {} on {}", user.getAuth().getUsername(), date);
             return;
         }
 
@@ -56,7 +57,7 @@ public class ChallengeAssignmentService {
 
         for (Challenge challenge : selectedChallenges) {
             UserChallenge userChallenge = UserChallenge.builder()
-                    .user(user)
+                    .userProfile(user)
                     .challenge(challenge)
                     .assignedAt(date)
                     .assignedDate(date)
@@ -69,25 +70,25 @@ public class ChallengeAssignmentService {
             userChallenges.add(userChallenge);
         }
 
-        userChallengeRepository.saveAll(userChallenges);
-        log.info("Assigned {} daily challenges to user {}", selectedChallenges.size(), user.getUsername());
+        userProfileChallengeRepository.saveAll(userChallenges);
+        log.info("Assigned {} daily challenges to user {}", selectedChallenges.size(), user.getAuth().getUsername());
     }
 
 
     @Transactional
-    public void assignWeeklyChallenges(User user, LocalDate date) {
+    public void assignWeeklyChallenges(UserProfile user, LocalDate date) {
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
         int year = date.get(weekFields.weekBasedYear());
         int weekNumber = date.get(weekFields.weekOfWeekBasedYear());
 
-        boolean alreadyAssigned = userChallengeRepository
-                .existsByUserAndChallenge_TypeAndAssignedWeekYearAndAssignedWeekNumber(
+        boolean alreadyAssigned = userProfileChallengeRepository
+                .existsByUserProfileAndChallenge_TypeAndAssignedWeekYearAndAssignedWeekNumber(
                         user, ChallengeType.WEEKLY, year, weekNumber
                 );
 
         if (alreadyAssigned) {
             log.debug("Weekly challenges already assigned for user {} in week {}-{}",
-                    user.getUsername(), year, weekNumber);
+                    user.getAuth().getUsername(), year, weekNumber);
             return;
         }
 
@@ -102,7 +103,7 @@ public class ChallengeAssignmentService {
 
         for (Challenge challenge : selectedChallenges) {
             UserChallenge userChallenge = UserChallenge.builder()
-                    .user(user)
+                    .userProfile(user)
                     .challenge(challenge)
                     .assignedAt(date)
                     .assignedDate(date)
@@ -115,20 +116,20 @@ public class ChallengeAssignmentService {
             userChallenges.add(userChallenge);
         }
 
-        userChallengeRepository.saveAll(userChallenges);
+        userProfileChallengeRepository.saveAll(userChallenges);
         log.info("Assigned {} weekly challenges to user {} for week {}-{}",
-                selectedChallenges.size(), user.getUsername(), year, weekNumber);
+                selectedChallenges.size(), user.getAuth().getUsername(), year, weekNumber);
     }
 
 
     private List<Challenge> selectRandomChallenges(
-            User user,
+            UserProfile user,
             ChallengeType type,
             int count,
             LocalDate avoidSince
     ) {
         // Get recently assigned challenge IDs to avoid
-        List<Integer> recentIds = userChallengeRepository.findRecentChallengeIds(
+        List<Integer> recentIds = userProfileChallengeRepository.findRecentChallengeIds(
                 user, type, avoidSince
         );
 

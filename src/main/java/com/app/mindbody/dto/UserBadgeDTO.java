@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class UserBadgeDTO {
     private String badge_name;
-    private int badge_id;
+    private int badgeId;
     private String badge_description;
     private LocalDateTime earned_at;
     private RequirementTypeEnums requirement_type;
@@ -29,12 +29,12 @@ public class UserBadgeDTO {
 
 
         return UserBadgeDTO.builder()
-                .badge_id(badge.getId())
+                .badgeId(badge.getId())
                 .badge_name(badge.getBadge_name())
                 .badge_description(badge.getBadge_description())
                 .requirement_type(badge.getRequirement_type())
                 .requirement_value(badge.getRequirementValue())
-                .earned_at(userBadge.getEarned_at())
+                .earned_at(userBadge.getEarnedAt())
                 .build();
     }
 }

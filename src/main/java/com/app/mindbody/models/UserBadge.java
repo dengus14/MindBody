@@ -25,8 +25,8 @@ public class UserBadge {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "user_profile_id", nullable = false)
+    private UserProfile userProfile;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "badge_id", nullable = false)
@@ -34,5 +34,5 @@ public class UserBadge {
 
     @CreatedDate
     @Column(name = "earned_at")
-    private LocalDateTime earned_at;
+    private LocalDateTime earnedAt;
 }

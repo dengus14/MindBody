@@ -14,13 +14,13 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "user_challenges",
         indexes = {
-                @Index(name = "idx_user_challenge_date", columnList = "user_id, assigned_date"),
-                @Index(name = "idx_user_challenge_week", columnList = "user_id, assigned_week_year, assigned_week_number"),
-                @Index(name = "idx_user_completed", columnList = "user_id, completed")
+                @Index(name = "idx_user_challenge_date", columnList = "user_profile_id, assigned_date"),
+                @Index(name = "idx_user_challenge_week", columnList = "user_profile_id, assigned_week_year, assigned_week_number"),
+                @Index(name = "idx_user_completed", columnList = "user_profile_id, completed")
         },
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_user_challenge_daily", columnNames = {"user_id", "challenge_id", "assigned_date"}),
-                @UniqueConstraint(name = "uk_user_challenge_weekly", columnNames = {"user_id", "challenge_id", "assigned_week_year", "assigned_week_number"})
+                @UniqueConstraint(name = "uk_user_challenge_daily", columnNames = {"user_profile_id", "challenge_id", "assigned_date"}),
+                @UniqueConstraint(name = "uk_user_challenge_weekly", columnNames = {"user_profile_id", "challenge_id", "assigned_week_year", "assigned_week_number"})
         }
 )
 @Data
@@ -35,8 +35,8 @@ public class UserChallenge {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "user_profile_id", nullable = false)
+    private UserProfile userProfile;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "challenge_id", nullable = false)

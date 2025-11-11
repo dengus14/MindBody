@@ -1,10 +1,10 @@
 package com.app.mindbody.service;
 
 import com.app.mindbody.dto.ClaimChallengeResponse;
-import com.app.mindbody.models.User;
 import com.app.mindbody.models.UserChallenge;
-import com.app.mindbody.repositories.UserChallengeRepository;
-import com.app.mindbody.repositories.UserRepository;
+import com.app.mindbody.models.UserProfile;
+import com.app.mindbody.repositories.UserProfileChallengeRepository;
+import com.app.mindbody.repositories.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,16 +17,16 @@ import java.time.LocalDate;
 @Slf4j
 public class ChallengeCompletionService {
 
-    private final UserChallengeRepository userChallengeRepository;
-    private final UserRepository userRepository;
+    private final UserProfileChallengeRepository userProfileChallengeRepository;
+    private final UserProfileRepository userProfileRepository;
 
     @Transactional
-    public ClaimChallengeResponse claimChallenge(Long userChallengeId, User user) {
-        UserChallenge userChallenge = userChallengeRepository.findById(userChallengeId)
+    public ClaimChallengeResponse claimChallenge(Long userChallengeId, UserProfile user) {
+        UserChallenge userChallenge = userProfileChallengeRepository.findById(userChallengeId)
                 .orElseThrow(() -> new RuntimeException("Challenge not found"));
 
         // Validate ownership
-        if (!userChallenge.getUser().getId().equals(user.getId())) {
+        if (!userChallenge.getUserProfile().getId().equals(user.getId())) {
             throw new RuntimeException("Unauthorized: Challenge does not belong to this user");
         }
 
@@ -57,11 +57,11 @@ public class ChallengeCompletionService {
         userChallenge.setClaimed(true);
         userChallenge.setClaimedAt(LocalDate.now());
 
-        userChallengeRepository.save(userChallenge);
-        userRepository.save(user);
+        userProfileChallengeRepository.save(userChallenge);
+        userProfileRepository.save(user);
 
         log.info("User {} claimed challenge {} and earned {} points",
-                user.getUsername(),
+                user.getAuth().getUsername(),
                 userChallenge.getChallenge().getChallengeName(),
                 pointsAwarded);
 
