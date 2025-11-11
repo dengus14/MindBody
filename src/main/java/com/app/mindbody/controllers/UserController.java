@@ -32,7 +32,7 @@ public class UserController {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Map entity → DTO
+
         UserDTO dto = UserDTO.builder()
                 .id(user.getId())
                 .username(user.getUsername())

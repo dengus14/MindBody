@@ -25,9 +25,9 @@ public class BadgeDTO {
     private boolean completed;
 
     public static BadgeDTO fromEntity(Badge badge, int progress_value) {
-        // Extract the badge object from the relationship
 
-        // Build and return the DTO with values from both UserBadge and Badge
+
+
         return BadgeDTO.builder()
                 .badge_id(badge.getId())
                 .badge_name(badge.getBadge_name())

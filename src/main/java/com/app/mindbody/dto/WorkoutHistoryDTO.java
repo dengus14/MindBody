@@ -22,10 +22,10 @@ public class WorkoutHistoryDTO {
     private String notes;
 
     public static WorkoutHistoryDTO fromEntity(Workout workout) {
-        // Extract the badge object from the relationship
 
 
-        // Build and return the DTO with values from both UserBadge and Badge
+
+
         return WorkoutHistoryDTO.builder()
                 .id(workout.getId())
                 .created_at(workout.getCreatedAt())

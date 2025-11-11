@@ -24,10 +24,10 @@ public class UserBadgeDTO {
     private int requirement_value;
 
     public static UserBadgeDTO fromEntity(UserBadge userBadge) {
-        // Extract the badge object from the relationship
+
         Badge badge = userBadge.getBadge();
 
-        // Build and return the DTO with values from both UserBadge and Badge
+
         return UserBadgeDTO.builder()
                 .badge_id(badge.getId())
                 .badge_name(badge.getBadge_name())

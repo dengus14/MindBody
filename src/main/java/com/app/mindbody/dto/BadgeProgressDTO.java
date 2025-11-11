@@ -20,10 +20,10 @@ public class BadgeProgressDTO {
     private int currentStreak;
 
     public static BadgeProgressDTO getProgressDTO(int daysRemaining, int targetValue, int currentStreak, String nextBadgeName ) {
-        // Extract the badge object from the relationship
 
 
-        // Build and return the DTO with values from both UserBadge and Badge
+
+
         return BadgeProgressDTO.builder()
                 .nextBadgeName(nextBadgeName)
                 .daysRemaining(daysRemaining)

@@ -20,10 +20,7 @@ public class ChallengeController {
 
     private final ChallengeService challengeService;
 
-    /**
-     * Get active challenges for authenticated user
-     * Automatically assigns challenges if not already assigned
-     */
+
     @GetMapping("/active")
     public ResponseEntity<List<ChallengeDTO>> getActiveChallenges(
             @AuthenticationPrincipal User user
@@ -35,9 +32,7 @@ public class ChallengeController {
         return ResponseEntity.ok(challenges);
     }
 
-    /**
-     * Claim a completed challenge to receive points
-     */
+
     @PostMapping("/claim")
     public ResponseEntity<ClaimChallengeResponse> claimChallenge(
             @RequestBody ClaimChallengeRequest request,

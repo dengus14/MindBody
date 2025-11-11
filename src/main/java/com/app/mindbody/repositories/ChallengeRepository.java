@@ -12,10 +12,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
 
     List<Challenge> findAllByOrderByRequirementValueAsc();
 
-    /**
-     * Get random challenges of a specific type, excluding recently assigned ones
-     * PostgreSQL uses RANDOM() instead of RAND()
-     */
+
     @Query(value = "SELECT c.* FROM challenges c " +
             "WHERE c.type = :type " +
             "AND c.id NOT IN :excludedIds " +
@@ -27,9 +24,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Integer> {
             @Param("limit") int limit
     );
 
-    /**
-     * Fallback when not enough challenges to exclude
-     */
+
     @Query(value = "SELECT c.* FROM challenges c " +
             "WHERE c.type = :type " +
             "ORDER BY RANDOM() " +
